@@ -256,6 +256,8 @@ Printable
 	| Expression {
 		addMsg(" ");
 		addMsgObj(&$<object_val>0);
+
+		addPrintExp_j($<object_val>0.type);
 	}
 ;
 
@@ -271,13 +273,20 @@ Expression
 Or
 	: And
 	| Or LOR And{
-				// here is correct
-				objectExpBoolean('1', &$<object_val>1, &$<object_val>2, &$<object_val>0);}
+		// here is correct
+		objectExpBoolean('1', &$<object_val>1, &$<object_val>2, &$<object_val>0);
+		
+		addOpByType_j("lor", $<object_val>0.type);
+		}
 ;
 
 And
 	: BitwiseOr //{setType(&$<object_val>1, &$<object_val>0);}
-	| And LAN BitwiseOr{objectExpBoolean('2', &$<object_val>1, &$<object_val>2, &$<object_val>0);} 
+	| And LAN BitwiseOr{
+		objectExpBoolean('2', &$<object_val>1, &$<object_val>2, &$<object_val>0);
+		
+		addOpByType_j("lan", $<object_val>0.type);
+		} 
 ;
 
 BitwiseOr
@@ -298,40 +307,79 @@ BitwiseAnd
 Equality
 	: Relational //{setType(&$<object_val>1, &$<object_val>0);}
 	| Equality EQL Relational{objectExpBoolean('3', &$<object_val>1, &$<object_val>2, &$<object_val>0);}  
-	| Equality NEQ Relational{objectExpBoolean('4', &$<object_val>1, &$<object_val>2, &$<object_val>0);} 
+	| Equality NEQ Relational{
+		objectExpBoolean('4', &$<object_val>1, &$<object_val>2, &$<object_val>0);
+		addOpByType_j("neq", $<object_val>0.type);
+		} 
 ;
 
 Relational
-	: Shift //{dg(2);}{setType(&$<object_val>1, &$<object_val>0);}
-	| Relational LES Shift{printf("LES\n");} //{setType(&$<object_val>1, &$<object_val>0);}
+	: Shift 
+	| Relational LES Shift{
+		printf("LES\n");
 
-	| Relational GTR Shift{printf("GTR\n");} //{setType(&$<object_val>1, &$<object_val>0);}
+		//位元運算
+		addOpByType_j("les", $<object_val>0.type);
+		$<object_val>0.type = OBJECT_TYPE_BOOL;
+	} 
+	| Relational GTR Shift{
+		printf("GTR\n");
 
-	| Relational LEQ Shift{printf("LEQ\n");} //{setType(&$<object_val>1, &$<object_val>0);}
+		//位元運算
+		addOpByType_j("gtr", $<object_val>0.type);
+		$<object_val>0.type = OBJECT_TYPE_BOOL;
+	}
+	| Relational LEQ Shift{
+		printf("LEQ\n");
 
-	| Relational GEQ Shift{printf("GEQ\n");} //{setType(&$<object_val>1, &$<object_val>0);}
+		$<object_val>0.type = OBJECT_TYPE_BOOL;} 
+
+	| Relational GEQ Shift{
+		printf("GEQ\n");
+
+		$<object_val>0.type = OBJECT_TYPE_BOOL;} 
 
 ;
 
 Shift
-	: Additive //{dg(1);}{setType(&$<object_val>1, &$<object_val>0);}
+	: Additive
 	| Shift SHR Additive{printf("SHR\n");} 
-	//| Shift SHL {printf("SHL\n");} Additive
 ;
 
 Additive
 	: Multiplicative //{setType(&$<object_val>1, &$<object_val>0);}
-	| Additive ADD Multiplicative{printf("ADD\n");} //{setType(&$<object_val>1, &$<object_val>0);}
+	| Additive ADD Multiplicative{
+		printf("ADD\n");
 
-	| Additive SUB Multiplicative{printf("SUB\n");} //{setType(&$<object_val>1, &$<object_val>0);}
+		//輸出 加法指令
+		addOpByType_j("add", $<object_val>0.type);}
+
+	| Additive SUB Multiplicative{
+		printf("SUB\n");
+		
+		//輸出 減法指令
+		addOpByType_j("sub", $<object_val>0.type);}
 
 ;
 
 Multiplicative
 	: TypeCast
-	| Multiplicative MUL TypeCast{printf("MUL\n");}
-	| Multiplicative DIV TypeCast{printf("DIV\n");}
-	| Multiplicative REM TypeCast{printf("REM\n");}
+	| Multiplicative MUL TypeCast{
+		printf("MUL\n");
+
+		//輸出 乘法指令
+		addOpByType_j("mul", $<object_val>0.type);}
+	| Multiplicative DIV TypeCast{
+		printf("DIV\n");
+		
+		//輸出 除法指令
+		addOpByType_j("div", $<object_val>0.type);}
+	| Multiplicative REM TypeCast{
+		printf("REM\n");
+
+		//輸出 模數指令
+		addOpByType_j("rem", $<object_val>0.type);
+	}
 
 ;
 
@@ -345,17 +393,23 @@ TypeCast
 
 Unary
 	: BNT Unary{
-				//$<object_val>0.type = $<object_val>2.type;
-				printf("BNT\n");} 
+		$<object_val>0.type = $<object_val>1.type;	//傳遞類別
+		printf("BNT\n");} 
 	| ADD Unary{
-				//$<object_val>0.type = $<object_val>2.type;
-				printf("ADD\n");} 
+		$<object_val>0.type = $<object_val>1.type;	//傳遞類別
+		printf("ADD\n");} 
 	| SUB Unary{
-				//$<object_val>0.type = $<object_val>2.type;
-				printf("NEG\n");} 
+		$<object_val>0.type = $<object_val>1.type;	//傳遞類別
+		printf("NEG\n");	//輸出資訊
+
+		//輸出unary negation指令
+		addOpByType_j("neg", $<object_val>0.type);
+	} 
 	| NOT Unary{
-				//$<object_val>0.type = $<object_val>2.type;
-				printf("NOT\n");} 
+		$<object_val>0.type = $<object_val>1.type;	//傳遞類別
+		printf("NOT\n");
+		
+		addOpByType_j("not", $<object_val>0.type);} 
 	| Post
 ;
 
@@ -368,40 +422,42 @@ Post
 Primary
     : INT_LIT{
 			$<object_val>0.type = OBJECT_TYPE_INT;
-			//$<object_val>0.value = $<i_var>1;
 			printf("INT_LIT %d\n", $<i_var>1);
+
+			//輸出 載入整數到stack頂端
+			code("ldc %d", $<i_var>1);
 		}
 	| FLOAT_LIT {
 			$<object_val>0.type = OBJECT_TYPE_FLOAT;
-			//$<object_val>0.value = 0;
 			printf("FLOAT_LIT %f\n", $<f_var>1);
+
+			//輸出 載入整數到stack頂端
+			code("ldc %f", $<f_var>1);
 		}
     | '(' Expression ')' {
 			$<object_val>0.type = $<object_val>1.type;
-			//$<object_val>0.value = $<i_var>1;
 		}
 	| BOOL_LIT {
 			$<object_val>0.type = OBJECT_TYPE_BOOL; 
-			//$<object_val>0.value = (int64_t)$<b_var>1;
 			printBool($<b_var>1);
+
+			//輸出 載入整數到stack頂端
+			code("ldc %d", $<b_var>1);
 		}
 	| IDENT {
 			ObjectType type = getVarTypeByName($<s_var>1);
 			$<object_val>0.type = type;
-			//$<object_val>0.value = 0;
 			printIDByName($<s_var>1, 'v');
 		}
 	| FunctionCall //{printf("call: check(IILjava/lang/String;B)B\n");}
 	| IDENT '[' Expression ']' {
 			ObjectType type = getVarTypeByName($<s_var>1);
 			$<object_val>0.type = type;
-			//$<object_val>0.value = 0;
 			printIDByName($<s_var>1, 'v');
 	}
 	| IDENT '[' Expression ']' '[' Expression ']' {
 		ObjectType type = getVarTypeByName($<s_var>1);
 		$<object_val>0.type = type;
-		//$<object_val>0.value = 0;
 		printIDByName($<s_var>1, 'v');
 	}
 ;

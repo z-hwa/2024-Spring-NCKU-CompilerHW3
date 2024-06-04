@@ -21,6 +21,18 @@ void dumpScope();
 
 /*hw3 part*/
 
+//根據現在運算的型別，導入到不同的運算
+void addOpByType_j(char* op, ObjectType type);
+
+//整數與布林型別的運算
+void addOpInt_j(char *op);
+
+//浮點數型別的運算
+void addOpFloat_j(char *op);
+
+//添加 輸出指令(整數或浮點數)
+void addPrintExp_j(ObjectType type);
+
 //添加return
 void addRet_j();
 
