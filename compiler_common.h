@@ -29,6 +29,7 @@ typedef enum _objectType {
     OBJECT_TYPE_FLOAT,
     OBJECT_TYPE_DOUBLE,
     OBJECT_TYPE_STR,
+    OBJECT_TYPE_FUNCTION,
 } ObjectType;
 
 typedef struct _symbolData {
@@ -37,6 +38,7 @@ typedef struct _symbolData {
     int64_t addr;
     int32_t lineno;
     char* func_sig;
+    uint8_t func_var;
 } SymbolData;
 
 typedef struct _object {
@@ -45,7 +47,9 @@ typedef struct _object {
     uint64_t value;
     uint8_t flag;
     SymbolData* symbol;
-    LinkedList* arraySubscript;
+
+	ObjectType funcType;
+    //LinkedList* arraySubscript;
 } Object;
 
 extern int yylineno;
