@@ -322,7 +322,7 @@ Or
 		objectExpBoolean('1', &$<object_val>1, &$<object_val>2, &$<object_val>0);
 		
 		addOpByType_j("or", $<object_val>0.type);
-		}
+	}
 ;
 
 And
@@ -461,7 +461,11 @@ TypeCast
 Unary
 	: BNT Unary{
 		$<object_val>0.type = $<object_val>1.type;	//傳遞類別
-		printf("BNT\n");} 
+		printf("BNT\n"); 
+
+		//輸出unary negation指令
+		addOpByType_j("not", $<object_val>0.type);
+	}
 	| ADD Unary{
 		$<object_val>0.type = $<object_val>1.type;	//傳遞類別
 		printf("ADD\n");} 

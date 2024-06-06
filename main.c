@@ -123,8 +123,8 @@ void addLocalVar_j(char* name, char isAssign) {
 	int var_index = sym->addr;	//設置名稱為var_index的變數
 	ObjectType type = var->type; //獲取該變數類別
 
+	//如果沒有設定初始值，就自動載入一個0到stack頂端
 	if(isAssign == 'n') codeRaw("ldc 0");
-	else //do nothing
 
 	//將stack頂端的數字儲存到變數中
 	if(type == OBJECT_TYPE_INT) {
@@ -172,8 +172,10 @@ void addOpInt_j(char* op) {
 	else if(strcmp(op, "and")==0) codeRaw("iand");
 	else if(strcmp(op, "not")==0) {
 		codeRaw("\n");
-		codeRaw("iconst_0");	//將0丟到stack頂端
-		codeRaw("ixor");	// val xor 0 => !val
+
+		codeRaw("iconst_m1");
+		codeRaw("ixor");
+
 		codeRaw("\n");
 	}
 	else if(strcmp(op, "neq")==0) {
@@ -254,7 +256,7 @@ void addOpInt_j(char* op) {
 		codeRaw("ldc -1");
 		codeRaw("iadd");
 	}
-	else if(strcmp(op, "")==0) codeRaw("");
+	else if(strcmp(op, "shl")==0) codeRaw("ishl");
 	else if(strcmp(op, "")==0) codeRaw("");
 }
 
@@ -289,8 +291,10 @@ void addOpFloat_j(char* op) {
 	else if(strcmp(op, "and")==0) codeRaw("fand");
 	else if(strcmp(op, "not")==0) {
 		codeRaw("\n");
-		codeRaw("fconst_0");	//將0丟到stack頂端
-		codeRaw("fxor");	// val xor 0 => !val
+
+		codeRaw("fconst_m1");
+		codeRaw("fxor");
+
 		codeRaw("\n");
 	}
 	else if(strcmp(op, "neq")==0) {
@@ -383,7 +387,7 @@ void addOpFloat_j(char* op) {
 		codeRaw("ldc -1.0");
 		codeRaw("fadd");
 	}
-	else if(strcmp(op, "")==0) codeRaw("");
+	else if(strcmp(op, "shl")==0) codeRaw("fshl");
 }
 
 void addPrintExp_j(ObjectType type) {
@@ -669,7 +673,7 @@ bool objectExpBinary(char op, Object* a, Object* b, Object* out) {
 		printf("BAN\n");
 	}
 
-	out->type = a->type;
+	out->type = OBJECT_TYPE_BOOL;
     
 	
 	return false;
