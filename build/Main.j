@@ -28,10 +28,14 @@
         
 
         ifeq out1
+        goto f22
+        f42:
         iload 4
         ldc 1
         iadd
         istore 4
+        goto for0
+        f22:
         ldc 4
         i2f
         fload 2
@@ -57,7 +61,7 @@
         iload 3
         
 
-        ifeq else2
+        ifeq else3
             fload 1
             fload 5
             fadd
@@ -65,8 +69,8 @@
             iload 3
             ldc 0
             istore 3
-        goto out3
-        else2:
+        goto out4
+        else3:
             fload 1
             fload 5
             fsub
@@ -74,8 +78,8 @@
             iload 3
             ldc 1
             istore 3
-        out3:
-        goto for0
+        out4:
+        goto f42
     out1:
     
 

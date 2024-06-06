@@ -112,6 +112,7 @@ void addFor_j(char type) {
 	}
 	else if(type == 'i') {
 		codeRaw("\n");
+
 		code("for%d:", tct);	//設置for標記
 		pushAddr(&for_st, tct++);
 	}
@@ -122,6 +123,17 @@ void addFor_j(char type) {
 		code("out%d:", frontAddr(&out_st));	//離開標記
 		codeRaw("\n");
 	}
+	else if(type == '1') {
+		code("goto f2%d", tct);
+		code("f4%d:", tct);
+	}
+	else if(type == '2') {
+		code("f2%d:", tct);
+		pushAddr(&for_st, tct++);
+	}
+	else if(type == '3') {
+		code("goto f4%d", frontAddr(&for_st));
+	} 
 }
 
 void addWhile_j(char type) {

@@ -115,8 +115,10 @@ IterationStmt
 	| FOR {
 		printf("FOR\n");
 		pushScope();
-	} '(' ForCondition ')' CompoundStmt {
-		addFor_j('c');	//go to 循環標記
+	} '(' ForCondition ')' {
+		addFor_j('2');	//get jump, f2
+	} CompoundStmt {
+		addFor_j('3');	//f3
 		dumpScope();
 		addFor_j('o');	//離開標記
 	}
@@ -127,7 +129,12 @@ ForCondition
 		addFor_j('i');	//設置循環標記;
 	} ExpressionStmt {
 		addFor_j('f');	//check condition
-	} ExpressionStmt
+
+		addFor_j('1');	//f1
+		addFor_j('4');	//f4
+	} ExpressionStmt {
+		addFor_j('c');
+	}
 	| VARIABLE_T IDENT ':' IDENT {
 		//auto i:a	類型的for迴圈
 		insert($<s_var>2, getVarTypeByName($<s_var>4), 1);
