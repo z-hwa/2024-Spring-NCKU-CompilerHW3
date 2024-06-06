@@ -101,7 +101,17 @@ JumpStmt
 
 /*while and for*/
 IterationStmt
-	: WHILE {printf("WHILE\n");} '(' Expression ')' {pushScope();} CompoundStmt {dumpScope();}
+	: WHILE {
+		printf("WHILE\n");
+		addWhile_j('i');
+	} '(' Expression ')' {
+		addWhile_j('w');
+		pushScope();
+	} CompoundStmt {
+		addWhile_j('c');
+		dumpScope();
+		addWhile_j('o');
+	}
 	| FOR {printf("FOR\n"); pushScope();} '(' ForCondition ')' CompoundStmt {dumpScope();}
 ;
 

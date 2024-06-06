@@ -21,6 +21,9 @@ void dumpScope();
 
 /*hw3 part*/
 
+//while 描述
+void addWhile_j(char type);
+
 //if-else描述
 void addIf_j(char type);
 

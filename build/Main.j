@@ -37,6 +37,8 @@
         fmul
         fdiv
         fstore 5
+        
+
         ifeq else0
             fload 5
             fload 1
@@ -54,6 +56,8 @@
             ldc 1
         else1:
         out0:
+        
+
     fload 1
     return
 .end method
