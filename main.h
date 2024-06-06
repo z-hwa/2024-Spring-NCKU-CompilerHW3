@@ -21,6 +21,12 @@ void dumpScope();
 
 /*hw3 part*/
 
+//break描述
+void addBreak_j();
+
+//for 描述
+void addFor_j(char type);
+
 //while 描述
 void addWhile_j(char type);
 

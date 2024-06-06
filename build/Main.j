@@ -10,11 +10,27 @@
     ldc 1
         ldc 1
         istore 4
+        
+
+        for0:
         iload 4
         iload 0
+        
+
+        if_icmplt gtr_true_0
+        gtr_false_0:
+        iconst_0
+        goto gtr_end_0
+        gtr_true_0:
+        iconst_1
+        gtr_end_0:
+        
+
+        ifeq out1
         iload 4
         ldc 1
         iadd
+        istore 4
         ldc 4
         i2f
         fload 2
@@ -39,24 +55,23 @@
         fstore 5
         
 
-        ifeq else0
-            fload 5
+        ifeq else2
             fload 1
-            swap
+            fload 5
             fadd
             fstore 1
             ldc 0
-        goto out0
-        else0:
-            fload 5
+        goto out3
+        else2:
             fload 1
-            swap
+            fload 5
             fsub
             fstore 1
             ldc 1
-        else1:
-        out0:
-        
+        out3:
+        goto for0
+    out1:
+    
 
     fload 1
     return

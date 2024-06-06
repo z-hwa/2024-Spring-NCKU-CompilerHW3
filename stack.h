@@ -14,11 +14,16 @@ typedef struct stackNode{
 	//used to message
 	const char *msg;
 
+	//used to record tag of address
+	int addr;
+
 	struct stackNode *next;
 }Stack;
 
 Stack* top(Stack **stack);
 bool push(Stack **stack, Stack data);
+bool pushAddr(Stack **head, int addr);
+int frontAddr(Stack **head);
 Stack pop(Stack **stack);
 
 #endif

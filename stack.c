@@ -44,10 +44,28 @@ bool push(Stack **head, Stack nodeData){
 
 	newnode->index = nodeData.index;
 	newnode->indexSt = nodeData.indexSt;
+	newnode->addr = nodeData.addr;
 
     newnode->next = (*head);
     (*head) = newnode;
     return true;
+}
+
+bool pushAddr(Stack **head, int addr) {
+	Stack data;
+	data.addr = addr;
+	push(head, data);
+	return true;
+}
+
+int frontAddr(Stack **head){
+    if((*head) == NULL) {
+        return -1;
+	}
+
+	int addr = (*head)->addr;
+	pop(head);
+	return addr;
 }
 
 Stack pop(Stack **head){

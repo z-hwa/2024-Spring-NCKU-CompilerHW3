@@ -85,26 +85,52 @@ LinkedList *print_list; //用於記錄順向的輸出訊息
 LinkedList *var_list;	//用於記錄變數的陣列
 
 /*hw3 part*/
+Stack *if_st, *out_st, *while_st, *for_st;
+int tct = 0;	//total counter
 
-int add_ct = 0;	//用於變數比較的if else計數器
-int if_ct = 0;	//if標記
-int while_ct = 0;	//while標記
+int for_ct = 0;	//for標記
+int add_ct = 0;	//比較模塊的計數器
 
-int out_ct = 0;	//用於做任何判斷的最終跳出位置標記
+void addBreak_j(){
+	int addr = frontAddr(&out_st);
+	code("goto out%d", addr);
+	pushAddr(&out_st, addr);
+}
 
-void addWhile_j(char type) {
-	if(type == 'w') {
-		code("ifeq out%d", out_ct);	//如果條件判斷為0，跳出
+void addFor_j(char type) {
+	if(type == 'f') {
+		code("ifeq out%d", tct);	//如果條件判斷為0，跳出
+		pushAddr(&out_st, tct++);
 	}
 	else if(type == 'i') {
 		codeRaw("\n");
-		code("while%d:", while_ct);	//設置while標記
+		code("for%d:", tct);	//設置for標記
+		pushAddr(&for_st, tct++);
 	}
 	else if(type == 'c') {
-		code("goto while%d", while_ct++);	//check part
+		code("goto for%d", frontAddr(&for_st));	//check part
 	}
 	else if(type == 'o') {
-		code("out%d:", out_ct++);	//離開標記
+		code("out%d:", frontAddr(&out_st));	//離開標記
+		codeRaw("\n");
+	}
+}
+
+void addWhile_j(char type) {
+	if(type == 'w') {
+		code("ifeq out%d", tct);	//如果條件判斷為0，跳出
+		pushAddr(&out_st, tct++);
+	}
+	else if(type == 'i') {
+		codeRaw("\n");
+		code("while%d:", tct);	//設置while標記
+		pushAddr(&while_st, tct++);
+	}
+	else if(type == 'c') {
+		code("goto while%d", frontAddr(&while_st));	//check part
+	}
+	else if(type == 'o') {
+		code("out%d:", frontAddr(&out_st));	//離開標記
 		codeRaw("\n");
 	}
 }
@@ -112,16 +138,15 @@ void addWhile_j(char type) {
 void addIf_j(char type){
 	if(type == 'i') {
 		codeRaw("\n");
-		code("ifeq else%d", if_ct);	//如果條件判斷為0，不執行以下程式碼，跳出
+		code("ifeq else%d", tct);	//如果條件判斷為0，不執行以下程式碼，跳出
+		pushAddr(&if_st, tct++);
 	}
-	else if(type == 'e') code("else%d:", if_ct++);	//幫else做標記
+	else if(type == 'e') code("else%d:", frontAddr(&if_st));	//幫else做標記
 	else if(type == 'g') {
-		code("goto out%d", out_ct);	//成功執行if，跳出
+		code("goto out%d", tct);	//if如果成功執行，需要跳出
+		pushAddr(&out_st, tct++);
 	}
-	else if(type == 'o') {
-		code("out%d:", out_ct++);
-		codeRaw("\n");
-	}
+	else if(type == 'o') code("out%d:", frontAddr(&out_st));	//幫out做標記
 }
 
 void addCast_j(ObjectType type){
@@ -133,10 +158,6 @@ void addCast_j(ObjectType type){
 }
 
 void addAssign_j(char* name, char* op) {
-
-	addPushLocalVar_j(name);	//將需要assign的變數推入Stack的第二個位置
-	codeRaw("swap");
-
 	//進行對應操作
 	ObjectType type = getVarTypeByName(name);
 	addOpByType_j(op, type);
@@ -305,6 +326,23 @@ void addOpInt_j(char* op) {
 		codeRaw("iadd");
 	}
 	else if(strcmp(op, "shl")==0) codeRaw("ishl");
+	else if(strcmp(op, "les")==0) {
+		//比較大小
+		codeRaw("\n");
+		code("if_icmplt gtr_true_%d", add_ct); // if v1 > v2
+
+		code("gtr_false_%d:", add_ct);	//false
+		codeRaw("iconst_0");	//結果設為false
+		code("goto gtr_end_%d", add_ct);
+
+		code("gtr_true_%d:", add_ct); //true
+		codeRaw("iconst_1");	// 結果設為true
+
+		code("gtr_end_%d:", add_ct);
+		codeRaw("\n");
+
+		add_ct++;
+	}
 	else if(strcmp(op, "")==0) codeRaw("");
 }
 

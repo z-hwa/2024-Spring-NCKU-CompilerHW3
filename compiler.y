@@ -78,10 +78,7 @@ GlobalStmt
 	| CoutStmt
     | ReturnStmt
 	| AssignStmt
-	| SelectionStmt {
-		addIf_j('e');
-		addIf_j('o');
-	}
+	| SelectionStmt {addIf_j('o');}
 	| IterationStmt
 	| JumpStmt
 	| FunctionCallStmt
@@ -96,6 +93,7 @@ FunctionCallStmt
 JumpStmt
 	: BREAK ';' {
 		printf("BREAK\n");
+		addBreak_j();
 	}
 ;
 
@@ -103,25 +101,35 @@ JumpStmt
 IterationStmt
 	: WHILE {
 		printf("WHILE\n");
-		addWhile_j('i');
+		addWhile_j('i');	//設置循環標記
 	} '(' Expression ')' {
-		addWhile_j('w');
+		addWhile_j('w');	//check condition
 		pushScope();
 	} CompoundStmt {
-		addWhile_j('c');
+		addWhile_j('c');	//go to 循環標記
 		dumpScope();
-		addWhile_j('o');
+		addWhile_j('o');	//離開標記
 	}
-	| FOR {printf("FOR\n"); pushScope();} '(' ForCondition ')' CompoundStmt {dumpScope();}
+	| FOR {
+		printf("FOR\n");
+		pushScope();
+	} '(' ForCondition ')' CompoundStmt {
+		addFor_j('c');	//go to 循環標記
+		dumpScope();
+		addFor_j('o');	//離開標記
+	}
 ;
 
 ForCondition
-	: ExpressionStmt ExpressionStmt ExpressionStmt
+	: ExpressionStmt {
+		addFor_j('i');	//設置循環標記;
+	} ExpressionStmt {
+		addFor_j('f');	//check condition
+	} ExpressionStmt
 	| VARIABLE_T IDENT ':' IDENT {
-		//printf("%d\n", $<var_type>1);
+		//auto i:a	類型的for迴圈
 		insert($<s_var>2, getVarTypeByName($<s_var>4), 1);
-		printIDByName($<s_var>4, 'v');		
-		//insertAuto($<s_var>2, $<var_type>1, $<object_val>3.type, 1);} 
+		printIDByName($<s_var>4, 'v'); 
 	}
 ;
 
@@ -146,11 +154,11 @@ SelectionStmt
 		printf("IF\n");
 		addIf_j('i');	//判斷條件是否為真，錯的話跳出
 	} Selection {
-		addIf_j('g');	//成功執行if 接下來跳出if
+		addIf_j('g');
+		addIf_j('e');
 	}
 	| SelectionStmt ELSE {
 		printf("ELSE\n");
-		addIf_j('e');
 	} Selection
 ;
 
@@ -170,6 +178,7 @@ AssignBody
 		printIDByName($<s_var>1, 'v');	//輸出該變數資訊
 
 		assign_var = $<s_var>1;
+		addPushLocalVar_j($<s_var>1);	//將當前設值的變數放進stack
 	} Assign {
 		$<object_val>0.type = OBJECT_TYPE_BOOL;	//設值成功，回傳bool
 
@@ -513,13 +522,21 @@ Post
 	: Primary
 	| Primary INC_ASSIGN {
 		printf("INC_ASSIGN\n");
-		
-		addOpByType_j("inc", $<object_val>0.type);
+
+		//設值操作
+		addAssign_j(assign_var, "inc");
+
+		//將變數設值
+		addLocalVar_j($<s_var>1, 'y', $<object_val>0.type);
 	} 
 	| Primary DEC_ASSIGN {
 		printf("DEC_ASSIGN\n");
 		
-		addOpByType_j("dec", $<object_val>0.type);
+		//addOpByType_j("dec", $<object_val>0.type);
+		addAssign_j(assign_var, "dec");
+
+		//將變數設值
+		addLocalVar_j($<s_var>1, 'y', $<object_val>0.type);
 	} 
 ;
 
@@ -558,6 +575,7 @@ Primary
 
 		//輸出 載入該變數到stack頂端
 		addPushLocalVar_j($<s_var>1);
+		assign_var = $<s_var>1;	//設置當前修改的變數名稱
 	}
 	| FunctionCall //{printf("call: check(IILjava/lang/String;B)B\n");}
 	| IDENT '[' Expression ']' {
