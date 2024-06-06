@@ -7,7 +7,7 @@
     int yydebug = 1;
 
 	char* assign_var;	//用於為變數設值的時候，紀錄當前設定的變數名稱
-	ObjectType nowDealType;
+	ObjectType nowDealType;	//用於變數設值的時候，紀錄值的類型，用於判斷變數與值類型是否相同
 %}
 
 
@@ -78,8 +78,10 @@ GlobalStmt
 	| CoutStmt
     | ReturnStmt
 	| AssignStmt
-	//| CompoundStmt
-	| SelectionStmt
+	| SelectionStmt {
+		addIf_j('e');
+		addIf_j('o');
+	}
 	| IterationStmt
 	| JumpStmt
 	| FunctionCallStmt
@@ -130,8 +132,16 @@ CompoundStmt
 
 /*if else*/
 SelectionStmt
-	: IF '(' Expression ')'{ printf("IF\n");} Selection
-	| SelectionStmt ELSE {printf("ELSE\n"); } Selection
+	: IF '(' Expression ')'{ 
+		printf("IF\n");
+		addIf_j('i');	//判斷條件是否為真，錯的話跳出
+	} Selection {
+		addIf_j('g');	//成功執行if 接下來跳出if
+	}
+	| SelectionStmt ELSE {
+		printf("ELSE\n");
+		addIf_j('e');
+	} Selection
 ;
 
 Selection

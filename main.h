@@ -21,6 +21,9 @@ void dumpScope();
 
 /*hw3 part*/
 
+//if-else描述
+void addIf_j(char type);
+
 //型別轉換描述
 void addCast_j(ObjectType type);
 

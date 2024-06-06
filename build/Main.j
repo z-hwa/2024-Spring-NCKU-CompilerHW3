@@ -37,18 +37,23 @@
         fmul
         fdiv
         fstore 5
+        ifeq else0
             fload 5
             fload 1
             swap
             fadd
             fstore 1
             ldc 0
+        goto out0
+        else0:
             fload 5
             fload 1
             swap
             fsub
             fstore 1
             ldc 1
+        else1:
+        out0:
     fload 1
     return
 .end method

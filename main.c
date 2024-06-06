@@ -86,7 +86,20 @@ LinkedList *var_list;	//用於記錄變數的陣列
 
 /*hw3 part*/
 
-int add_ct = 0;
+int add_ct = 0;	//用於變數比較的if else計數器
+int if_ct = 0;
+int out_ct = 0;
+
+void addIf_j(char type){
+	if(type == 'i') {
+		code("ifeq else%d", if_ct);	//如果條件判斷為0，不執行以下程式碼，跳出
+	}
+	else if(type == 'e') code("else%d:", if_ct++);	//幫else做標記
+	else if(type == 'g') {
+		code("goto out%d", out_ct);	//成功執行if，跳出
+	}
+	else if(type == 'o') code("out%d:", out_ct++);
+}
 
 void addCast_j(ObjectType type){
 
