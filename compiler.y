@@ -5,6 +5,8 @@
     #include "main.h"
 
     int yydebug = 1;
+
+	char* assign_var;	//用於為變數設值的時候，紀錄當前設定的變數名稱
 %}
 
 
@@ -143,10 +145,21 @@ AssignStmt
 ;
 
 AssignBody
-	: IDENT { printIDByName($<s_var>1, 'v');} Assign {$<object_val>0.type = OBJECT_TYPE_BOOL;}
+	: IDENT { 
+		printIDByName($<s_var>1, 'v');	//輸出該變數資訊
+
+		assign_var = $<s_var>1;
+	} Assign {
+		$<object_val>0.type = OBJECT_TYPE_BOOL;	//設值成功，回傳bool
+
+		//將變數設值
+		addLocalVar_j($<s_var>1, 'y');
+	}
 	| IDENT '[' Expression ']' {
 		printIDByName($<s_var>1, 'v');
-	} Assign {$<object_val>0.type = OBJECT_TYPE_BOOL;}
+	} Assign {
+		$<object_val>0.type = OBJECT_TYPE_BOOL;
+	}
 	| IDENT '[' Expression ']' '[' Expression ']' {
 		printIDByName($<s_var>1, 'v');
 	} Assign {$<object_val>0.type = OBJECT_TYPE_BOOL;}
@@ -155,25 +168,47 @@ AssignBody
 Assign
 	: Assignable
 	| VAL_ASSIGN Assign{printf("EQL_ASSIGN\n");}
-	| ADD_ASSIGN Assign{printf("ADD_ASSIGN\n");}
-	| SUB_ASSIGN Assign{printf("SUB_ASSIGN\n");}
-	| MUL_ASSIGN Assign{printf("MUL_ASSIGN\n");}
-	| DIV_ASSIGN Assign{printf("DIV_ASSIGN\n");}
-	| REM_ASSIGN Assign{printf("REM_ASSIGN\n");}
-	| BAN_ASSIGN Assign{printf("BAN_ASSIGN\n");}
-	| BOR_ASSIGN Assign{printf("BOR_ASSIGN\n");}
-	| BXO_ASSIGN Assign{printf("BXO_ASSIGN\n");}
-	| SHR_ASSIGN Assign{printf("SHR_ASSIGN\n");}
-	| SHL_ASSIGN Assign{printf("SHL_ASSIGN\n");}
-	//| INC_ASSIGN Assign{printf("INC_ASSIGN\n");}
-	//| DEC_ASSIGN Assign{printf("DEC_ASSIGN\n");} 
+	| ADD_ASSIGN Assign{
+		printf("ADD_ASSIGN\n");
+		addAssign_j(assign_var, "add");
+	}
+	| SUB_ASSIGN Assign{
+		printf("SUB_ASSIGN\n");
+		addAssign_j(assign_var, "sub");}
+	| MUL_ASSIGN Assign{
+		printf("MUL_ASSIGN\n");
+		addAssign_j(assign_var, "mul");}
+	| DIV_ASSIGN Assign{
+		printf("DIV_ASSIGN\n");
+		addAssign_j(assign_var, "div");}
+	| REM_ASSIGN Assign{
+		printf("REM_ASSIGN\n");
+		addAssign_j(assign_var, "rem");}
+	| BAN_ASSIGN Assign{
+		printf("BAN_ASSIGN\n");
+		addAssign_j(assign_var, "and");}
+	| BOR_ASSIGN Assign{
+		printf("BOR_ASSIGN\n");
+		addAssign_j(assign_var, "or");}
+	| BXO_ASSIGN Assign{
+		printf("BXO_ASSIGN\n");
+		addAssign_j(assign_var, "xor");}
+	| SHR_ASSIGN Assign{
+		printf("SHR_ASSIGN\n");
+		addAssign_j(assign_var, "shr");}
+	| SHL_ASSIGN Assign{
+		printf("SHL_ASSIGN\n");
+		addAssign_j(assign_var, "shl");}
 ;
 
-Assignable	: STR_LIT  {
+Assignable	
+	: STR_LIT  {
 		$<object_val>0.type = OBJECT_TYPE_STR;
 		printf("STR_LIT \"%s\"\n", $<s_var>1);
+
+		code("ldc \"%s\"", $<s_var>1);
 	}
-	| Expression //{printf("\n%d\n", $<object_val>0.type);}
+	| Expression
 ;
 
 /* define variable */
@@ -187,10 +222,20 @@ DeclaratorList
 ;
 
 Declarator
-	: IDENT {insert($<s_var>1, $<var_type>0, 0);}	//普通的變數宣告
+	: IDENT {
+		//普通的變數宣告
+		insert($<s_var>1, $<var_type>0, 0);
+
+		//創建並添加該變數
+		addLocalVar_j($<s_var>1, 'n');
+	}	
 	| IDENT VAL_ASSIGN Assignable {
 		//普通的變數宣告與賦值
-		insertAuto($<s_var>1, $<var_type>0, $<var_type>2, 0);}
+		insertAuto($<s_var>1, $<var_type>0, $<var_type>2, 0);
+
+		//創建並添加該變數
+		addLocalVar_j($<s_var>1, 'y');
+	}
 	| IDENT '[' Expression ']' {
 		//陣列的變數宣告
 		printf("create array: %d\n", 0);
@@ -276,7 +321,7 @@ Or
 		// here is correct
 		objectExpBoolean('1', &$<object_val>1, &$<object_val>2, &$<object_val>0);
 		
-		addOpByType_j("lor", $<object_val>0.type);
+		addOpByType_j("or", $<object_val>0.type);
 		}
 ;
 
@@ -285,32 +330,47 @@ And
 	| And LAN BitwiseOr{
 		objectExpBoolean('2', &$<object_val>1, &$<object_val>2, &$<object_val>0);
 		
-		addOpByType_j("lan", $<object_val>0.type);
-		} 
+		addOpByType_j("and", $<object_val>0.type);
+	} 
 ;
 
 BitwiseOr
-	: BitwiseXor //{setType(&$<object_val>1, &$<object_val>0);}
-	| BitwiseOr BOR BitwiseXor{objectExpBinary('1', &$<object_val>1, &$<object_val>2, &$<object_val>0);} 
+	: BitwiseXor
+	| BitwiseOr BOR BitwiseXor{
+		objectExpBinary('1', &$<object_val>1, &$<object_val>2, &$<object_val>0);
+		
+		addOpByType_j("or", $<object_val>0.type);
+	} 
 ;
 
 BitwiseXor
 	: BitwiseAnd //{setType(&$<object_val>1, &$<object_val>0);}
-	| BitwiseXor BXO BitwiseAnd{objectExpBinary('2', &$<object_val>1, &$<object_val>2, &$<object_val>0);} 
+	| BitwiseXor BXO BitwiseAnd{
+		objectExpBinary('2', &$<object_val>1, &$<object_val>2, &$<object_val>0);
+		
+		addOpByType_j("xor", $<object_val>0.type);	
+	} 
 ;
 
 BitwiseAnd
 	: Equality //{setType(&$<object_val>1, &$<object_val>0);}
-	| BitwiseAnd BAN Equality{objectExpBinary('3', &$<object_val>1, &$<object_val>2, &$<object_val>0);} 
+	| BitwiseAnd BAN Equality{
+		objectExpBinary('3', &$<object_val>1, &$<object_val>2, &$<object_val>0);
+
+		addOpByType_j("and", $<object_val>0.type);	
+	} 
 ;
 
 Equality
 	: Relational //{setType(&$<object_val>1, &$<object_val>0);}
-	| Equality EQL Relational{objectExpBoolean('3', &$<object_val>1, &$<object_val>2, &$<object_val>0);}  
+	| Equality EQL Relational{
+		objectExpBoolean('3', &$<object_val>1, &$<object_val>2, &$<object_val>0);
+		addOpByType_j("eql", $<object_val>0.type);	
+	}  
 	| Equality NEQ Relational{
 		objectExpBoolean('4', &$<object_val>1, &$<object_val>2, &$<object_val>0);
 		addOpByType_j("neq", $<object_val>0.type);
-		} 
+	} 
 ;
 
 Relational
@@ -332,18 +392,25 @@ Relational
 	| Relational LEQ Shift{
 		printf("LEQ\n");
 
+		//位元運算
+		addOpByType_j("leq", $<object_val>0.type);
 		$<object_val>0.type = OBJECT_TYPE_BOOL;} 
 
 	| Relational GEQ Shift{
 		printf("GEQ\n");
 
+		//位元運算
+		addOpByType_j("geq", $<object_val>0.type);
 		$<object_val>0.type = OBJECT_TYPE_BOOL;} 
 
 ;
 
 Shift
 	: Additive
-	| Shift SHR Additive{printf("SHR\n");} 
+	| Shift SHR Additive{
+		printf("SHR\n");
+		addOpByType_j("shr", $<object_val>0.type);
+	} 
 ;
 
 Additive
@@ -415,8 +482,16 @@ Unary
 
 Post
 	: Primary
-	| Primary INC_ASSIGN {printf("INC_ASSIGN\n");}
-	| Primary DEC_ASSIGN {printf("DEC_ASSIGN\n");}
+	| Primary INC_ASSIGN {
+		printf("INC_ASSIGN\n");
+		
+		addOpByType_j("inc", $<object_val>0.type);
+	} 
+	| Primary DEC_ASSIGN {
+		printf("DEC_ASSIGN\n");
+		
+		addOpByType_j("dec", $<object_val>0.type);
+	} 
 ;
 
 Primary
@@ -445,10 +520,16 @@ Primary
 			code("ldc %d", $<b_var>1);
 		}
 	| IDENT {
-			ObjectType type = getVarTypeByName($<s_var>1);
-			$<object_val>0.type = type;
-			printIDByName($<s_var>1, 'v');
-		}
+		//詞性修飾
+		ObjectType type = getVarTypeByName($<s_var>1);
+		$<object_val>0.type = type;
+
+		//輸出資訊
+		printIDByName($<s_var>1, 'v');
+
+		//輸出 載入該變數到stack頂端
+		addPushLocalVar_j($<s_var>1);
+	}
 	| FunctionCall //{printf("call: check(IILjava/lang/String;B)B\n");}
 	| IDENT '[' Expression ']' {
 			ObjectType type = getVarTypeByName($<s_var>1);
@@ -512,4 +593,3 @@ FunctionParameterStmt
 ;
 %%
 /* C code section */
-

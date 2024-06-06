@@ -88,6 +88,54 @@ LinkedList *var_list;	//用於記錄變數的陣列
 
 int add_ct = 0;
 
+void addAssign_j(char* name, char* op) {
+
+	addPushLocalVar_j(name);	//將需要assign的變數推入Stack的第二個位置
+	codeRaw("swap");
+
+	//進行對應操作
+	ObjectType type = getVarTypeByName(name);
+	addOpByType_j(op, type);
+}
+
+void addPushLocalVar_j(char* name) {
+	Object *var = getObjectByName(name, 'v');
+	SymbolData *sym = var->symbol;
+
+	int var_index = sym->addr;	//設置名稱為var_index的變數
+	ObjectType type = var->type;
+
+	//將stack頂端的數字儲存到變數中
+	if(type == OBJECT_TYPE_INT) {
+		code("iload %d", var_index);
+	}else if(type == OBJECT_TYPE_FLOAT) {
+		code("fload %d", var_index);
+	}else if(type == OBJECT_TYPE_STR) {
+		code("aload %d", var_index);
+	}
+
+}
+
+void addLocalVar_j(char* name, char isAssign) {
+	Object *var = getObjectByName(name, 'v');
+	SymbolData *sym = var->symbol;
+
+	int var_index = sym->addr;	//設置名稱為var_index的變數
+	ObjectType type = var->type; //獲取該變數類別
+
+	if(isAssign == 'n') codeRaw("ldc 0");
+	else //do nothing
+
+	//將stack頂端的數字儲存到變數中
+	if(type == OBJECT_TYPE_INT) {
+		code("istore %d", var_index);
+	}else if(type == OBJECT_TYPE_FLOAT) {
+		code("fstore %d", var_index);
+	}else if(type == OBJECT_TYPE_STR) {
+		code("astore %d", var_index);
+	}
+}
+
 void addOpByType_j(char* op, ObjectType type) {
 	// printf("%d\n", type);
 	// printf("%s\n", objectTypeName[type]);
@@ -120,8 +168,8 @@ void addOpInt_j(char* op) {
 
 		add_ct++;
 	}
-	else if(strcmp(op, "lor")==0) codeRaw("ior");
-	else if(strcmp(op, "lan")==0) codeRaw("iand");
+	else if(strcmp(op, "or")==0) codeRaw("ior");
+	else if(strcmp(op, "and")==0) codeRaw("iand");
 	else if(strcmp(op, "not")==0) {
 		codeRaw("\n");
 		codeRaw("iconst_0");	//將0丟到stack頂端
@@ -131,7 +179,7 @@ void addOpInt_j(char* op) {
 	else if(strcmp(op, "neq")==0) {
 		//比較大小
 		codeRaw("\n");
-		code("if_icmpne gtr_true_%d", add_ct); // if v1 > v2
+		code("if_icmpne gtr_true_%d", add_ct); // if v1 != v2
 
 		code("gtr_false_%d:", add_ct);	//false
 		codeRaw("iconst_0");	//結果設為false
@@ -145,10 +193,67 @@ void addOpInt_j(char* op) {
 
 		add_ct++;
 	}
-	else if(strcmp(op, "")==0) codeRaw("");
-	else if(strcmp(op, "")==0) codeRaw("");
-	else if(strcmp(op, "")==0) codeRaw("");
-	else if(strcmp(op, "")==0) codeRaw("");
+	else if(strcmp(op, "xor")==0) codeRaw("ixor");
+	else if(strcmp(op, "eql")==0) {
+		//比較大小
+		codeRaw("\n");
+		code("if_icmpeq gtr_true_%d", add_ct); // if v1 = v2
+
+		code("gtr_false_%d:", add_ct);	//false
+		codeRaw("iconst_0");	//結果設為false
+		code("goto gtr_end_%d", add_ct);
+
+		code("gtr_true_%d:", add_ct); //true
+		codeRaw("iconst_1");	// 結果設為true
+
+		code("gtr_end_%d:", add_ct);
+		codeRaw("\n");
+
+		add_ct++;
+	}
+	else if(strcmp(op, "leq")==0) {
+		//比較大小
+		codeRaw("\n");
+		code("if_icmple gtr_true_%d", add_ct); // if v1 > v2
+
+		code("gtr_false_%d:", add_ct);	//false
+		codeRaw("iconst_0");	//結果設為false
+		code("goto gtr_end_%d", add_ct);
+
+		code("gtr_true_%d:", add_ct); //true
+		codeRaw("iconst_1");	// 結果設為true
+
+		code("gtr_end_%d:", add_ct);
+		codeRaw("\n");
+
+		add_ct++;
+	}
+	else if(strcmp(op, "geq")==0) {
+		//比較大小
+		codeRaw("\n");
+		code("if_icmpge gtr_true_%d", add_ct); // if v1 > v2
+
+		code("gtr_false_%d:", add_ct);	//false
+		codeRaw("iconst_0");	//結果設為false
+		code("goto gtr_end_%d", add_ct);
+
+		code("gtr_true_%d:", add_ct); //true
+		codeRaw("iconst_1");	// 結果設為true
+
+		code("gtr_end_%d:", add_ct);
+		codeRaw("\n");
+
+		add_ct++;
+	}
+	else if(strcmp(op, "shr")==0) codeRaw("ishr");
+	else if(strcmp(op, "inc")==0) {
+		codeRaw("ldc 1");
+		codeRaw("iadd");
+	}
+	else if(strcmp(op, "dec")==0) {
+		codeRaw("ldc -1");
+		codeRaw("iadd");
+	}
 	else if(strcmp(op, "")==0) codeRaw("");
 	else if(strcmp(op, "")==0) codeRaw("");
 }
@@ -180,10 +285,106 @@ void addOpFloat_j(char* op) {
 
 		add_ct++;
 	}
+	else if(strcmp(op, "or")==0) codeRaw("for");
+	else if(strcmp(op, "and")==0) codeRaw("fand");
+	else if(strcmp(op, "not")==0) {
+		codeRaw("\n");
+		codeRaw("fconst_0");	//將0丟到stack頂端
+		codeRaw("fxor");	// val xor 0 => !val
+		codeRaw("\n");
+	}
+	else if(strcmp(op, "neq")==0) {
+		//比較大小
+		codeRaw("\n");
+		
+		codeRaw("fsub");
+		codeRaw("f2i");
+		code("if_icmpne gtr_true_%d", add_ct); // if v1 != v2
+
+		code("gtr_false_%d:", add_ct);	//false
+		codeRaw("iconst_0");	//結果設為false
+		code("goto gtr_end_%d", add_ct);
+
+		code("gtr_true_%d:", add_ct); //true
+		codeRaw("iconst_1");	// 結果設為true
+
+		code("gtr_end_%d:", add_ct);
+		codeRaw("\n");
+
+		add_ct++;
+	}
+	else if(strcmp(op, "xor")==0) codeRaw("fxor");
+	else if(strcmp(op, "eql")==0) {
+		//比較大小
+		codeRaw("\n");
+		
+		codeRaw("fsub");
+		codeRaw("f2i");
+		code("if_icmpeq gtr_true_%d", add_ct); // if v1 = v2
+
+		code("gtr_false_%d:", add_ct);	//false
+		codeRaw("iconst_0");	//結果設為false
+		code("goto gtr_end_%d", add_ct);
+
+		code("gtr_true_%d:", add_ct); //true
+		codeRaw("iconst_1");	// 結果設為true
+
+		code("gtr_end_%d:", add_ct);
+		codeRaw("\n");
+
+		add_ct++;
+	}
+	else if(strcmp(op, "leq")==0) {
+		//比較大小
+		codeRaw("\n");
+		
+		codeRaw("fsub");
+		codeRaw("f2i");
+		code("if_icmple gtr_true_%d", add_ct); // if v1 > v2
+
+		code("gtr_false_%d:", add_ct);	//false
+		codeRaw("iconst_0");	//結果設為false
+		code("goto gtr_end_%d", add_ct);
+
+		code("gtr_true_%d:", add_ct); //true
+		codeRaw("iconst_1");	// 結果設為true
+
+		code("gtr_end_%d:", add_ct);
+		codeRaw("\n");
+
+		add_ct++;
+	}
+	else if(strcmp(op, "geq")==0) {
+		//比較大小
+		codeRaw("\n");
+		
+		codeRaw("fsub");
+		codeRaw("f2i");
+		code("if_icmpge gtr_true_%d", add_ct); // if v1 > v2
+
+		code("gtr_false_%d:", add_ct);	//false
+		codeRaw("iconst_0");	//結果設為false
+		code("goto gtr_end_%d", add_ct);
+
+		code("gtr_true_%d:", add_ct); //true
+		codeRaw("iconst_1");	// 結果設為true
+
+		code("gtr_end_%d:", add_ct);
+		codeRaw("\n");
+
+		add_ct++;
+	}
+	else if(strcmp(op, "shr")==0) codeRaw("fshr");
+	else if(strcmp(op, "inc")==0) {
+		codeRaw("ldc 1.0");
+		codeRaw("fadd");
+	}
+	else if(strcmp(op, "dec")==0) {
+		codeRaw("ldc -1.0");
+		codeRaw("fadd");
+	}
 	else if(strcmp(op, "")==0) codeRaw("");
-	else if(strcmp(op, "")==0) codeRaw("");
-	else if(strcmp(op, "")==0) codeRaw("");
-	else if(strcmp(op, "")==0) codeRaw("");}
+}
 
 void addPrintExp_j(ObjectType type) {
 	codeRaw("getstatic java/lang/System/out Ljava/io/PrintStream;");
@@ -195,6 +396,8 @@ void addPrintExp_j(ObjectType type) {
 		codeRaw("invokevirtual java/io/PrintStream/print(Z)V");
 	} else if(type == OBJECT_TYPE_FLOAT) {
 		codeRaw("invokevirtual java/io/PrintStream/print(F)V");
+	} else if(type == OBJECT_TYPE_STR) {
+		codeRaw("invokevirtual java/io/PrintStream/print(Ljava/lang/String;)V");
 	}
 }
 
