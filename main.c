@@ -88,6 +88,14 @@ LinkedList *var_list;	//用於記錄變數的陣列
 
 int add_ct = 0;
 
+void addCast_j(ObjectType type){
+
+	//因為測資只有float and int，所以做特判
+	//不是很general的方法
+	if(type == OBJECT_TYPE_INT) codeRaw("f2i");
+	else if(type == OBJECT_TYPE_FLOAT) codeRaw("i2f");
+}
+
 void addAssign_j(char* name, char* op) {
 
 	addPushLocalVar_j(name);	//將需要assign的變數推入Stack的第二個位置
@@ -116,7 +124,7 @@ void addPushLocalVar_j(char* name) {
 
 }
 
-void addLocalVar_j(char* name, char isAssign) {
+void addLocalVar_j(char* name, char isAssign, ObjectType valType) {
 	Object *var = getObjectByName(name, 'v');
 	SymbolData *sym = var->symbol;
 
@@ -128,8 +136,12 @@ void addLocalVar_j(char* name, char isAssign) {
 
 	//將stack頂端的數字儲存到變數中
 	if(type == OBJECT_TYPE_INT) {
+		if(valType == OBJECT_TYPE_FLOAT) codeRaw("f2i");
+
 		code("istore %d", var_index);
 	}else if(type == OBJECT_TYPE_FLOAT) {
+		if(valType == OBJECT_TYPE_INT) codeRaw("i2f");
+
 		code("fstore %d", var_index);
 	}else if(type == OBJECT_TYPE_STR) {
 		code("astore %d", var_index);

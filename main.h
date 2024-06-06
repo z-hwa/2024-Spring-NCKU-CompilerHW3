@@ -21,14 +21,19 @@ void dumpScope();
 
 /*hw3 part*/
 
+//型別轉換描述
+void addCast_j(ObjectType type);
+
 //設值敘述
 void addAssign_j(char* name, char* op);
 
 //根據變數名稱 將本地變數推入stack
 void addPushLocalVar_j(char* namee);
 
-//將stack頂端的數字拉出來，設置成本地變數
-void addLocalVar_j(char* name, char isAssign);
+/*將stack頂端的數字拉出來，設置成本地變數
+會自動檢查要設置的值和變數的型態是否一樣
+但是float和int的特判*/
+void addLocalVar_j(char* name, char isAssign, ObjectType type);
 
 //根據現在運算的型別，導入到不同的運算
 void addOpByType_j(char* op, ObjectType type);

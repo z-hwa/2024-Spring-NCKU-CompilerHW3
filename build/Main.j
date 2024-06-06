@@ -16,17 +16,21 @@
         ldc 1
         iadd
         ldc 4
+        i2f
         fload 2
         iload 4
+        i2f
         fmul
         fload 2
         iload 4
+        i2f
         fmul
         ldc 1.000000
         fadd
         fmul
         fload 2
         iload 4
+        i2f
         fmul
         fload 2
         fadd

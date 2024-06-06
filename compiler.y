@@ -7,6 +7,7 @@
     int yydebug = 1;
 
 	char* assign_var;	//用於為變數設值的時候，紀錄當前設定的變數名稱
+	ObjectType nowDealType;
 %}
 
 
@@ -153,7 +154,7 @@ AssignBody
 		$<object_val>0.type = OBJECT_TYPE_BOOL;	//設值成功，回傳bool
 
 		//將變數設值
-		addLocalVar_j($<s_var>1, 'y');
+		addLocalVar_j($<s_var>1, 'y', nowDealType);
 	}
 	| IDENT '[' Expression ']' {
 		printIDByName($<s_var>1, 'v');
@@ -167,7 +168,9 @@ AssignBody
 
 Assign
 	: Assignable
-	| VAL_ASSIGN Assign{printf("EQL_ASSIGN\n");}
+	| VAL_ASSIGN Assign{
+		printf("EQL_ASSIGN\n");
+	}
 	| ADD_ASSIGN Assign{
 		printf("ADD_ASSIGN\n");
 		addAssign_j(assign_var, "add");
@@ -208,7 +211,7 @@ Assignable
 
 		code("ldc \"%s\"", $<s_var>1);
 	}
-	| Expression
+	| Expression { nowDealType = $<object_val>0.type; }
 ;
 
 /* define variable */
@@ -227,14 +230,14 @@ Declarator
 		insert($<s_var>1, $<var_type>0, 0);
 
 		//創建並添加該變數
-		addLocalVar_j($<s_var>1, 'n');
+		addLocalVar_j($<s_var>1, 'n', OBJECT_TYPE_INT);
 	}	
 	| IDENT VAL_ASSIGN Assignable {
 		//普通的變數宣告與賦值
 		insertAuto($<s_var>1, $<var_type>0, $<var_type>2, 0);
 
 		//創建並添加該變數
-		addLocalVar_j($<s_var>1, 'y');
+		addLocalVar_j($<s_var>1, 'y', $<object_val>2.type);
 	}
 	| IDENT '[' Expression ']' {
 		//陣列的變數宣告
@@ -455,6 +458,8 @@ TypeCast
 	| '(' VARIABLE_T ')' Unary {
 		$<object_val>0.type = $<var_type>2;
 		printCastInfo($<var_type>2);
+
+		addCast_j($<var_type>2);
 	}
 ;
 
