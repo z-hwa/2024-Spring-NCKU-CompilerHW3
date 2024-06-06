@@ -8,6 +8,8 @@
 
 	char* assign_var;	//用於為變數設值的時候，紀錄當前設定的變數名稱
 	ObjectType nowDealType;	//用於變數設值的時候，紀錄值的類型，用於判斷變數與值類型是否相同
+
+	int array_ct = 0;	//用於紀錄連續的陣列變數宣告
 %}
 
 
@@ -45,7 +47,7 @@
 /* Nonterminal with return, which need to sepcify type */
 %type <object_val> Expression Printable PrintableList
 %type <object_val> Or And BitwiseOr BitwiseXor BitwiseAnd Equality Relational Shift Additive Multiplicative Unary Primary TypeCast Post AssignBody Assignable
-%type <object_val> FunctionCall ArgumentList ArgumentListNonEmpty
+%type <object_val> FunctionCall ArgumentList ArgumentListNonEmpty, List, AssignList
 
 //%type <object_val> Term
 //%type <object_val> Factor
@@ -178,21 +180,34 @@ AssignBody
 		printIDByName($<s_var>1, 'v');	//輸出該變數資訊
 
 		assign_var = $<s_var>1;
-		addPushLocalVar_j($<s_var>1);	//將當前設值的變數放進stack
+		addPushLocalVar_j($<s_var>1, ' ');	//將當前設值的變數放進stack
 	} Assign {
 		$<object_val>0.type = OBJECT_TYPE_BOOL;	//設值成功，回傳bool
 
 		//將變數設值
 		addLocalVar_j($<s_var>1, 'y', nowDealType);
 	}
-	| IDENT '[' Expression ']' {
-		printIDByName($<s_var>1, 'v');
+	| IDENT '[' {
+		addPushLocalVar_j($<s_var>1, 'L');
+		assign_var = $<s_var>1;
+	} AssignList {$<object_val>0.type = $<object_val>3.type;}
+;
+
+/*如果存在語意致導方案，資料流就不會自動向上傳，而是會被擋住
+如果不存在，則會在grammar中自動向上傳遞一格
+*/
+AssignList
+	: Expression ']' {
+		printIDByName(assign_var, 'v');
+	} Assign {
+		$<object_val>0.type = OBJECT_TYPE_BOOL;
+		addArrayEle_j(nowDealType);
+	}
+	| Expression ']' '[' Expression ']' {
+		printIDByName(assign_var, 'v');
 	} Assign {
 		$<object_val>0.type = OBJECT_TYPE_BOOL;
 	}
-	| IDENT '[' Expression ']' '[' Expression ']' {
-		printIDByName($<s_var>1, 'v');
-	} Assign {$<object_val>0.type = OBJECT_TYPE_BOOL;}
 ;
 
 Assign
@@ -236,6 +251,7 @@ Assign
 Assignable	
 	: STR_LIT  {
 		$<object_val>0.type = OBJECT_TYPE_STR;
+		nowDealType = OBJECT_TYPE_STR;
 		printf("STR_LIT \"%s\"\n", $<s_var>1);
 
 		code("ldc \"%s\"", $<s_var>1);
@@ -272,22 +288,43 @@ Declarator
 		//陣列的變數宣告
 		printf("create array: %d\n", 0);
 		insert($<s_var>1, $<var_type>0, 0);
+
+		//創建陣列
+		codeRaw("newarray int");	//宣告陣列
+		addLocalVar_j($<s_var>1, 'y', OBJECT_TYPE_VOID);
 	}
 	| IDENT '[' Expression ']' '[' Expression ']' {
 		//二維陣列的變數宣告
 		insert($<s_var>1, $<var_type>0, 0);
 	}
-	| IDENT '[' Expression ']' VAL_ASSIGN '{' ArrayEles '}' {
+	| IDENT '[' Expression ']' {
+		codeRaw("newarray int");	//宣告陣列
+	} VAL_ASSIGN '{' ArrayEles '}' {
 		//一維陣列的變數宣告與賦值
-		printf("create array: %d\n", arrayFun('g'));
-		arrayFun('r');
+		printf("create array: %d\n", array_ct);
+		array_ct = 0;
 		insert($<s_var>1, $<var_type>0, 0);
+
+		//創建陣列
+		addLocalVar_j($<s_var>1, 'y', OBJECT_TYPE_VOID);
 	}  
 ;
 
 ArrayEles
-	: Assignable {arrayFun('c');}
-	| ArrayEles ',' Assignable {arrayFun('c');}
+	: {
+		codeRaw("dup");
+		code("ldc %d", array_ct);
+	}Assignable {
+		addArrayEle_j($<object_val>1.type);
+		array_ct++;
+	}
+	| ArrayEles ',' {
+		codeRaw("dup");
+		code("ldc %d", array_ct);
+	}Assignable {
+		addArrayEle_j($<object_val>3.type);
+		array_ct++;
+	}
 	| 
 ;
 
@@ -577,19 +614,31 @@ Primary
 		printIDByName($<s_var>1, 'v');
 
 		//輸出 載入該變數到stack頂端
-		addPushLocalVar_j($<s_var>1);
+		addPushLocalVar_j($<s_var>1, ' ');
 		assign_var = $<s_var>1;	//設置當前修改的變數名稱
 	}
 	| FunctionCall
-	| IDENT '[' Expression ']' {
-			ObjectType type = getVarTypeByName($<s_var>1);
-			$<object_val>0.type = type;
-			printIDByName($<s_var>1, 'v');
+	| IDENT '[' {
+		assign_var = $<s_var>1;
+
+		addPushLocalVar_j($<s_var>1, 'L');	//取得陣列ref	
+	} List {
+		$<object_val>0.type = $<object_val>3.type;
 	}
-	| IDENT '[' Expression ']' '[' Expression ']' {
-		ObjectType type = getVarTypeByName($<s_var>1);
+;
+
+List
+	: Expression ']' {
+		ObjectType type = getVarTypeByName(assign_var);
 		$<object_val>0.type = type;
-		printIDByName($<s_var>1, 'v');
+		printIDByName(assign_var, 'v');
+
+		addPushLocalVar_j(assign_var, 'l');
+	}
+	| Expression ']' '[' Expression ']' {
+		ObjectType type = getVarTypeByName(assign_var);
+		$<object_val>0.type = type;
+		printIDByName(assign_var, 'v');
 	}
 ;
 

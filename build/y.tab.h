@@ -163,7 +163,7 @@ extern int yydebug;
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 union YYSTYPE
 {
-#line 15 "./compiler.y"
+#line 17 "./compiler.y"
 
     ObjectType var_type;
     bool b_var;

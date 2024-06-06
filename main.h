@@ -21,6 +21,9 @@ void dumpScope();
 
 /*hw3 part*/
 
+//添加陣列元素的描述，用於陣列初始化
+void addArrayEle_j(ObjectType type);
+
 //break描述
 void addBreak_j();
 
@@ -40,7 +43,7 @@ void addCast_j(ObjectType type);
 void addAssign_j(char* name, char* op);
 
 //根據變數名稱 將本地變數推入stack
-void addPushLocalVar_j(char* namee);
+void addPushLocalVar_j(char* namee, char op);
 
 /*將stack頂端的數字拉出來，設置成本地變數
 會自動檢查要設置的值和變數的型態是否一樣

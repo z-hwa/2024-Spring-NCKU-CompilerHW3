@@ -91,6 +91,14 @@ int tct = 0;	//total counter
 int for_ct = 0;	//for標記
 int add_ct = 0;	//比較模塊的計數器
 
+void addArrayEle_j(ObjectType type){
+	if(type == OBJECT_TYPE_INT || type == OBJECT_TYPE_BOOL) {
+		codeRaw("iastore");
+	}else if(type == OBJECT_TYPE_FLOAT) {
+		codeRaw("fastore");
+	}
+}
+
 void addBreak_j(){
 	int addr = frontAddr(&out_st);
 	code("goto out%d", addr);
@@ -163,20 +171,33 @@ void addAssign_j(char* name, char* op) {
 	addOpByType_j(op, type);
 }
 
-void addPushLocalVar_j(char* name) {
+void addPushLocalVar_j(char* name, char op) {
 	Object *var = getObjectByName(name, 'v');
 	SymbolData *sym = var->symbol;
 
 	int var_index = sym->addr;	//設置名稱為var_index的變數
 	ObjectType type = var->type;
 
-	//將stack頂端的數字儲存到變數中
-	if(type == OBJECT_TYPE_INT || type == OBJECT_TYPE_BOOL) {
-		code("iload %d", var_index);
-	}else if(type == OBJECT_TYPE_FLOAT) {
-		code("fload %d", var_index);
-	}else if(type == OBJECT_TYPE_STR) {
-		code("aload %d", var_index);
+	if(op == 'l') {
+		//將變數中的數字儲存到stack頂端
+		if(type == OBJECT_TYPE_INT || type == OBJECT_TYPE_BOOL) {
+			codeRaw("iaload");
+		}else if(type == OBJECT_TYPE_FLOAT) {
+			codeRaw("faload");
+		}else if(type == OBJECT_TYPE_STR) {
+			codeRaw("aaload");
+		}
+	}
+	else if(op == 'L') code("aload %d", var_index);	//載入陣列位置
+	else {
+		//將變數中的數字儲存到stack頂端
+		if(type == OBJECT_TYPE_INT || type == OBJECT_TYPE_BOOL) {
+			code("iload %d", var_index);
+		}else if(type == OBJECT_TYPE_FLOAT) {
+			code("fload %d", var_index);
+		}else if(type == OBJECT_TYPE_STR) {
+			code("aload %d", var_index);
+		}
 	}
 
 }
@@ -190,6 +211,12 @@ void addLocalVar_j(char* name, char isAssign, ObjectType valType) {
 
 	//如果沒有設定初始值，就自動載入一個0到stack頂端
 	if(isAssign == 'n') codeRaw("ldc 0");
+	
+	//處理陣列的賦值
+	if(valType == OBJECT_TYPE_VOID) {
+		code("astore %d", var_index);
+		return;
+	}
 
 	//將stack頂端的數字儲存到變數中
 	if(type == OBJECT_TYPE_INT || type == OBJECT_TYPE_BOOL) {
@@ -539,16 +566,16 @@ void addFunDef_j(char* funName, char operation){
 //現在宣告的array中帶有的元素數量
 int arrayNum = 0;
 
-//用於紀錄連續的陣列變數宣告
-int arrayFun(char op){
-	if(op == 'c') {
-		//counter 累加有幾個陣列宣告
-		arrayNum++;
-	}else if(op == 'r') arrayNum = 0;	//重置計數器
-	else if(op == 'g') return arrayNum;	//回傳現在的計數
+// //用於紀錄連續的陣列變數宣告
+// int arrayFun(char op){
+// 	if(op == 'c') {
+// 		//counter 累加有幾個陣列宣告
+// 		arrayNum++;
+// 	}else if(op == 'r') arrayNum = 0;	//重置計數器
+// 	else if(op == 'g') return arrayNum;	//回傳現在的計數
 
-	return 0;
-}
+// 	return 0;
+// }
 
 //將Set設置為還沒開始設定變數
 void typeSet(bool b){
