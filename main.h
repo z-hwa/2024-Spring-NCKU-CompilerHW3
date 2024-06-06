@@ -63,7 +63,7 @@ void addOpFloat_j(char *op);
 void addPrintExp_j(ObjectType type);
 
 //添加return
-void addRet_j();
+void addRet_j(ObjectType type, int isMain);
 
 //println指令
 void addPrint_j();
@@ -80,6 +80,9 @@ void addFunEnd_j();
 /*hw3 part*/
 
 /*hw2 code start*/
+
+//當函數呼叫的時候，用於回傳函數呼叫的資訊
+char* getSigByName(char* name);
 
 //插入可能帶有auto的變數宣告
 void insertAuto(char* variableName, ObjectType objectType1, ObjectType objectType2, int src);

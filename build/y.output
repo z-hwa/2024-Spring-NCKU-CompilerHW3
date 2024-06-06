@@ -3,17 +3,36 @@ Terminals unused in grammar
     CONTINUE
 
 
+Rules useless in parser due to conflicts
+
+    3 Program: ε
+
+
+State 0 conflicts: 1 reduce/reduce
+State 2 conflicts: 8 shift/reduce
 State 11 conflicts: 1 shift/reduce
+State 12 conflicts: 8 shift/reduce, 1 reduce/reduce
 State 17 conflicts: 1 shift/reduce
 State 30 conflicts: 1 shift/reduce
 State 49 conflicts: 2 shift/reduce
 State 119 conflicts: 15 reduce/reduce
+State 123 conflicts: 8 shift/reduce
 State 125 conflicts: 2 reduce/reduce
 State 132 conflicts: 1 shift/reduce, 10 reduce/reduce
 State 137 conflicts: 1 shift/reduce
 State 153 conflicts: 2 shift/reduce
+State 184 conflicts: 8 shift/reduce
 State 186 conflicts: 10 reduce/reduce
-State 217 conflicts: 8 shift/reduce
+State 198 conflicts: 8 shift/reduce
+State 202 conflicts: 8 shift/reduce
+State 205 conflicts: 8 shift/reduce
+State 214 conflicts: 8 shift/reduce, 1 reduce/reduce
+State 216 conflicts: 8 shift/reduce
+State 217 conflicts: 8 shift/reduce, 11 reduce/reduce
+State 230 conflicts: 9 shift/reduce
+State 245 conflicts: 8 shift/reduce
+State 251 conflicts: 8 shift/reduce
+State 254 conflicts: 1 shift/reduce
 
 
 Grammar
@@ -145,141 +164,142 @@ Grammar
 
    79 ReturnStmt: RETURN Expression ';'
    80           | RETURN ';'
+   81           | ε
 
-   81 $@19: ε
+   82 $@19: ε
 
-   82 CoutStmt: COUT $@19 SHL PrintableList ';'
+   83 CoutStmt: COUT $@19 SHL PrintableList ';'
 
-   83 PrintableList: Printable
-   84              | PrintableList SHL Printable
+   84 PrintableList: Printable
+   85              | PrintableList SHL Printable
 
-   85 Printable: STR_LIT
-   86          | ENDL
-   87          | Expression
+   86 Printable: STR_LIT
+   87          | ENDL
+   88          | Expression
 
-   88 Expression: Or
-   89           | STR_LIT
+   89 Expression: Or
+   90           | STR_LIT
 
-   90 Or: And
-   91   | Or LOR And
+   91 Or: And
+   92   | Or LOR And
 
-   92 And: BitwiseOr
-   93    | And LAN BitwiseOr
+   93 And: BitwiseOr
+   94    | And LAN BitwiseOr
 
-   94 BitwiseOr: BitwiseXor
-   95          | BitwiseOr BOR BitwiseXor
+   95 BitwiseOr: BitwiseXor
+   96          | BitwiseOr BOR BitwiseXor
 
-   96 BitwiseXor: BitwiseAnd
-   97           | BitwiseXor BXO BitwiseAnd
+   97 BitwiseXor: BitwiseAnd
+   98           | BitwiseXor BXO BitwiseAnd
 
-   98 BitwiseAnd: Equality
-   99           | BitwiseAnd BAN Equality
+   99 BitwiseAnd: Equality
+  100           | BitwiseAnd BAN Equality
 
-  100 Equality: Relational
-  101         | Equality EQL Relational
-  102         | Equality NEQ Relational
+  101 Equality: Relational
+  102         | Equality EQL Relational
+  103         | Equality NEQ Relational
 
-  103 Relational: Shift
-  104           | Relational LES Shift
-  105           | Relational GTR Shift
-  106           | Relational LEQ Shift
-  107           | Relational GEQ Shift
+  104 Relational: Shift
+  105           | Relational LES Shift
+  106           | Relational GTR Shift
+  107           | Relational LEQ Shift
+  108           | Relational GEQ Shift
 
-  108 Shift: Additive
-  109      | Shift SHR Additive
+  109 Shift: Additive
+  110      | Shift SHR Additive
 
-  110 Additive: Multiplicative
-  111         | Additive ADD Multiplicative
-  112         | Additive SUB Multiplicative
+  111 Additive: Multiplicative
+  112         | Additive ADD Multiplicative
+  113         | Additive SUB Multiplicative
 
-  113 Multiplicative: TypeCast
-  114               | Multiplicative MUL TypeCast
-  115               | Multiplicative DIV TypeCast
-  116               | Multiplicative REM TypeCast
+  114 Multiplicative: TypeCast
+  115               | Multiplicative MUL TypeCast
+  116               | Multiplicative DIV TypeCast
+  117               | Multiplicative REM TypeCast
 
-  117 TypeCast: Unary
-  118         | '(' VARIABLE_T ')' Unary
+  118 TypeCast: Unary
+  119         | '(' VARIABLE_T ')' Unary
 
-  119 Unary: BNT Unary
-  120      | ADD Unary
-  121      | SUB Unary
-  122      | NOT Unary
-  123      | Post
+  120 Unary: BNT Unary
+  121      | ADD Unary
+  122      | SUB Unary
+  123      | NOT Unary
+  124      | Post
 
-  124 Post: Primary
-  125     | Primary INC_ASSIGN
-  126     | Primary DEC_ASSIGN
+  125 Post: Primary
+  126     | Primary INC_ASSIGN
+  127     | Primary DEC_ASSIGN
 
-  127 Primary: INT_LIT
-  128        | FLOAT_LIT
-  129        | '(' Expression ')'
-  130        | BOOL_LIT
-  131        | IDENT
-  132        | FunctionCall
+  128 Primary: INT_LIT
+  129        | FLOAT_LIT
+  130        | '(' Expression ')'
+  131        | BOOL_LIT
+  132        | IDENT
+  133        | FunctionCall
 
-  133 @20: ε
+  134 @20: ε
 
-  134 Primary: IDENT '[' @20 List
+  135 Primary: IDENT '[' @20 List
 
-  135 List: Expression ']'
-  136     | Expression ']' '[' Expression ']'
+  136 List: Expression ']'
+  137     | Expression ']' '[' Expression ']'
 
-  137 FunctionCall: IDENT '(' ArgumentList ')'
+  138 FunctionCall: IDENT '(' ArgumentList ')'
 
-  138 ArgumentList: ArgumentListNonEmpty
+  139 ArgumentList: ArgumentListNonEmpty
 
-  139 ArgumentListNonEmpty: Expression
-  140                     | ArgumentListNonEmpty ',' Expression
+  140 ArgumentListNonEmpty: Expression
+  141                     | ArgumentListNonEmpty ',' Expression
 
-  141 $@21: ε
+  142 $@21: ε
 
-  142 $@22: ε
+  143 $@22: ε
 
-  143 $@23: ε
+  144 $@23: ε
 
-  144 FunctionDefStmt: VARIABLE_T IDENT $@21 '(' $@22 FunctionParameterStmtList ')' $@23 '{' GlobalStmtList '}'
+  145 FunctionDefStmt: VARIABLE_T IDENT $@21 '(' $@22 FunctionParameterStmtList ')' $@23 '{' GlobalStmtList ReturnStmt '}'
 
-  145 FunctionParameterStmtList: FunctionParameterStmtList ',' FunctionParameterStmt
-  146                          | FunctionParameterStmt
-  147                          | ε
+  146 FunctionParameterStmtList: FunctionParameterStmtList ',' FunctionParameterStmt
+  147                          | FunctionParameterStmt
+  148                          | ε
 
-  148 FunctionParameterStmt: VARIABLE_T IDENT
+  149 FunctionParameterStmt: VARIABLE_T IDENT
 
-  149 $@24: ε
+  150 $@24: ε
 
-  150 FunctionParameterStmt: VARIABLE_T IDENT $@24 '[' ']'
+  151 FunctionParameterStmt: VARIABLE_T IDENT $@24 '[' ']'
 
 
 Terminals, with rules where they appear
 
     $end (0) 0
-    '(' <object_val> (40) 19 22 35 118 129 137 144
-    ')' (41) 19 22 35 118 129 137 144
-    ',' (44) 67 77 140 145
+    '(' <object_val> (40) 19 22 35 119 130 138 145
+    ')' (41) 19 22 35 119 130 138 145
+    ',' (44) 67 77 141 146
     ':' (58) 26
-    ';' (59) 15 16 27 31 42 65 79 80 82
-    '[' (91) 46 50 70 71 73 134 136 150
-    ']' (93) 48 50 70 71 73 135 136 150
-    '{' (123) 32 41 73 144
-    '}' (125) 32 41 73 144
+    ';' (59) 15 16 27 31 42 65 79 80 83
+    '[' (91) 46 50 70 71 73 135 137 151
+    ']' (93) 48 50 70 71 73 136 137 151
+    '{' (123) 32 41 73 145
+    '}' (125) 32 41 73 145
     error (256)
-    COUT (258) 82
-    SHR (259) 109
-    SHL (260) 82 84
-    BAN (261) 99
-    BOR (262) 95
-    BXO (263) 97
-    MUL (264) 114
-    DIV (265) 115
-    REM (266) 116
-    GTR (267) 105
-    LES (268) 104
-    GEQ (269) 107
-    LEQ (270) 106
-    EQL (271) 101
-    NEQ (272) 102
-    LAN (273) 93
-    LOR (274) 91
+    COUT (258) 83
+    SHR (259) 110
+    SHL (260) 83 85
+    BAN (261) 100
+    BOR (262) 96
+    BXO (263) 98
+    MUL (264) 115
+    DIV (265) 116
+    REM (266) 117
+    GTR (267) 106
+    LES (268) 105
+    GEQ (269) 108
+    LEQ (270) 107
+    EQL (271) 102
+    NEQ (272) 103
+    LAN (273) 94
+    LOR (274) 92
     VAL_ASSIGN (275) 52 69 73
     ADD_ASSIGN (276) 53
     SUB_ASSIGN (277) 54
@@ -291,8 +311,8 @@ Terminals, with rules where they appear
     BXO_ASSIGN (283) 60
     SHR_ASSIGN (284) 61
     SHL_ASSIGN (285) 62
-    INC_ASSIGN (286) 125
-    DEC_ASSIGN (287) 126
+    INC_ASSIGN (286) 126
+    DEC_ASSIGN (287) 127
     IF (288) 35
     ELSE (289) 37
     FOR (290) 22
@@ -300,17 +320,17 @@ Terminals, with rules where they appear
     RETURN (292) 79 80
     BREAK (293) 16
     CONTINUE (294)
-    ENDL (295) 86
-    VARIABLE_T <var_type> (296) 26 65 118 144 148 150
-    IDENT <s_val> (297) 26 44 46 68 69 70 71 73 131 134 137 144 148 150
-    BOOL_LIT <b_var> (298) 130
-    INT_LIT <i_var> (299) 127
-    FLOAT_LIT <f_var> (300) 128
-    STR_LIT <s_var> (301) 63 85 89
-    SUB <object_val> (302) 112 121
-    NOT <object_val> (303) 122
-    BNT <object_val> (304) 119
-    ADD <object_val> (305) 111 120
+    ENDL (295) 87
+    VARIABLE_T <var_type> (296) 26 65 119 145 149 151
+    IDENT <s_val> (297) 26 44 46 68 69 70 71 73 132 135 138 145 149 151
+    BOOL_LIT <b_var> (298) 131
+    INT_LIT <i_var> (299) 128
+    FLOAT_LIT <f_var> (300) 129
+    STR_LIT <s_var> (301) 63 86 90
+    SUB <object_val> (302) 113 122
+    NOT <object_val> (303) 123
+    BNT <object_val> (304) 120
+    ADD <object_val> (305) 112 121
 
 
 Nonterminals, with rules where they appear
@@ -325,7 +345,7 @@ Nonterminals, with rules where they appear
         on right: 2
     GlobalStmtList (63)
         on left: 4 5
-        on right: 2 4 32 33 41 144
+        on right: 2 4 32 33 41 145
     GlobalStmt (64)
         on left: 6 7 8 9 10 11 12 13 14
         on right: 4 5 38
@@ -432,108 +452,109 @@ Nonterminals, with rules where they appear
         on left: 76
         on right: 77
     ReturnStmt (99)
-        on left: 79 80
-        on right: 9
+        on left: 79 80 81
+        on right: 9 145
     CoutStmt (100)
-        on left: 82
+        on left: 83
         on right: 8
     $@19 (101)
-        on left: 81
-        on right: 82
+        on left: 82
+        on right: 83
     PrintableList <object_val> (102)
-        on left: 83 84
-        on right: 82 84
+        on left: 84 85
+        on right: 83 85
     Printable <object_val> (103)
-        on left: 85 86 87
-        on right: 83 84
+        on left: 86 87 88
+        on right: 84 85
     Expression <object_val> (104)
-        on left: 88 89
-        on right: 19 27 30 35 48 50 64 70 71 73 79 87 129 135 136 139 140
+        on left: 89 90
+        on right: 19 27 30 35 48 50 64 70 71 73 79 88 130 136 137 140 141
     Or <object_val> (105)
-        on left: 90 91
-        on right: 88 91
+        on left: 91 92
+        on right: 89 92
     And <object_val> (106)
-        on left: 92 93
-        on right: 90 91 93
+        on left: 93 94
+        on right: 91 92 94
     BitwiseOr <object_val> (107)
-        on left: 94 95
-        on right: 92 93 95
+        on left: 95 96
+        on right: 93 94 96
     BitwiseXor <object_val> (108)
-        on left: 96 97
-        on right: 94 95 97
+        on left: 97 98
+        on right: 95 96 98
     BitwiseAnd <object_val> (109)
-        on left: 98 99
-        on right: 96 97 99
+        on left: 99 100
+        on right: 97 98 100
     Equality <object_val> (110)
-        on left: 100 101 102
-        on right: 98 99 101 102
+        on left: 101 102 103
+        on right: 99 100 102 103
     Relational <object_val> (111)
-        on left: 103 104 105 106 107
-        on right: 100 101 102 104 105 106 107
+        on left: 104 105 106 107 108
+        on right: 101 102 103 105 106 107 108
     Shift <object_val> (112)
-        on left: 108 109
-        on right: 103 104 105 106 107 109
+        on left: 109 110
+        on right: 104 105 106 107 108 110
     Additive <object_val> (113)
-        on left: 110 111 112
-        on right: 108 109 111 112
+        on left: 111 112 113
+        on right: 109 110 112 113
     Multiplicative <object_val> (114)
-        on left: 113 114 115 116
-        on right: 110 111 112 114 115 116
+        on left: 114 115 116 117
+        on right: 111 112 113 115 116 117
     TypeCast <object_val> (115)
-        on left: 117 118
-        on right: 113 114 115 116
+        on left: 118 119
+        on right: 114 115 116 117
     Unary <object_val> (116)
-        on left: 119 120 121 122 123
-        on right: 117 118 119 120 121 122
+        on left: 120 121 122 123 124
+        on right: 118 119 120 121 122 123
     Post <object_val> (117)
-        on left: 124 125 126
-        on right: 123
+        on left: 125 126 127
+        on right: 124
     Primary <object_val> (118)
-        on left: 127 128 129 130 131 132 134
-        on right: 124 125 126
+        on left: 128 129 130 131 132 133 135
+        on right: 125 126 127
     @20 (119)
-        on left: 133
-        on right: 134
+        on left: 134
+        on right: 135
     List <object_val> (120)
-        on left: 135 136
-        on right: 134
+        on left: 136 137
+        on right: 135
     FunctionCall <object_val> (121)
-        on left: 137
-        on right: 15 132
-    ArgumentList <object_val> (122)
         on left: 138
-        on right: 137
+        on right: 15 133
+    ArgumentList <object_val> (122)
+        on left: 139
+        on right: 138
     ArgumentListNonEmpty <object_val> (123)
-        on left: 139 140
-        on right: 138 140
+        on left: 140 141
+        on right: 139 141
     FunctionDefStmt (124)
-        on left: 144
+        on left: 145
         on right: 7
     $@21 (125)
-        on left: 141
-        on right: 144
-    $@22 (126)
         on left: 142
-        on right: 144
-    $@23 (127)
+        on right: 145
+    $@22 (126)
         on left: 143
-        on right: 144
+        on right: 145
+    $@23 (127)
+        on left: 144
+        on right: 145
     FunctionParameterStmtList (128)
-        on left: 145 146 147
-        on right: 144 145
-    FunctionParameterStmt (129)
-        on left: 148 150
+        on left: 146 147 148
         on right: 145 146
+    FunctionParameterStmt (129)
+        on left: 149 151
+        on right: 146 147
     $@24 (130)
-        on left: 149
-        on right: 150
+        on left: 150
+        on right: 151
 
 
 State 0
 
     0 $accept: • Program $end
 
-    $end      reduce using rule 3 (Program)
+    $end      reduce using rule 1 ($@1)
+    $end      [reduce using rule 3 (Program)]
     $default  reduce using rule 1 ($@1)
 
     Program  go to state 1
@@ -560,6 +581,16 @@ State 2
     VARIABLE_T  shift, and go to state 10
     IDENT       shift, and go to state 11
 
+    COUT        [reduce using rule 81 (ReturnStmt)]
+    IF          [reduce using rule 81 (ReturnStmt)]
+    FOR         [reduce using rule 81 (ReturnStmt)]
+    WHILE       [reduce using rule 81 (ReturnStmt)]
+    RETURN      [reduce using rule 81 (ReturnStmt)]
+    BREAK       [reduce using rule 81 (ReturnStmt)]
+    VARIABLE_T  [reduce using rule 81 (ReturnStmt)]
+    IDENT       [reduce using rule 81 (ReturnStmt)]
+    $default    reduce using rule 81 (ReturnStmt)
+
     GlobalStmtList      go to state 12
     GlobalStmt          go to state 13
     FunctionCallStmt    go to state 14
@@ -584,9 +615,9 @@ State 3
 
 State 4
 
-   82 CoutStmt: COUT • $@19 SHL PrintableList ';'
+   83 CoutStmt: COUT • $@19 SHL PrintableList ';'
 
-    $default  reduce using rule 81 ($@19)
+    $default  reduce using rule 82 ($@19)
 
     $@19  go to state 25
 
@@ -661,7 +692,7 @@ State 9
 State 10
 
    65 DefineVariableStmt: VARIABLE_T • DeclaratorList ';'
-  144 FunctionDefStmt: VARIABLE_T • IDENT $@21 '(' $@22 FunctionParameterStmtList ')' $@23 '{' GlobalStmtList '}'
+  145 FunctionDefStmt: VARIABLE_T • IDENT $@21 '(' $@22 FunctionParameterStmtList ')' $@23 '{' GlobalStmtList ReturnStmt '}'
 
     IDENT  shift, and go to state 57
 
@@ -673,7 +704,7 @@ State 11
 
    44 AssignBody: IDENT • $@12 Assign
    46           | IDENT • '[' @13 AssignList
-  137 FunctionCall: IDENT • '(' ArgumentList ')'
+  138 FunctionCall: IDENT • '(' ArgumentList ')'
 
     '('  shift, and go to state 60
     '['  shift, and go to state 61
@@ -698,7 +729,17 @@ State 12
     VARIABLE_T  shift, and go to state 10
     IDENT       shift, and go to state 11
 
-    $default  reduce using rule 2 (Program)
+    $end        reduce using rule 2 (Program)
+    $end        [reduce using rule 81 (ReturnStmt)]
+    COUT        [reduce using rule 81 (ReturnStmt)]
+    IF          [reduce using rule 81 (ReturnStmt)]
+    FOR         [reduce using rule 81 (ReturnStmt)]
+    WHILE       [reduce using rule 81 (ReturnStmt)]
+    RETURN      [reduce using rule 81 (ReturnStmt)]
+    BREAK       [reduce using rule 81 (ReturnStmt)]
+    VARIABLE_T  [reduce using rule 81 (ReturnStmt)]
+    IDENT       [reduce using rule 81 (ReturnStmt)]
+    $default    reduce using rule 2 (Program)
 
     GlobalStmt          go to state 63
     FunctionCallStmt    go to state 14
@@ -804,7 +845,7 @@ State 24
 
 State 25
 
-   82 CoutStmt: COUT $@19 • SHL PrintableList ';'
+   83 CoutStmt: COUT $@19 • SHL PrintableList ';'
 
     SHL  shift, and go to state 67
 
@@ -865,49 +906,49 @@ State 29
 
 State 30
 
-  131 Primary: IDENT •
-  134        | IDENT • '[' @20 List
-  137 FunctionCall: IDENT • '(' ArgumentList ')'
+  132 Primary: IDENT •
+  135        | IDENT • '[' @20 List
+  138 FunctionCall: IDENT • '(' ArgumentList ')'
 
     '('  shift, and go to state 60
     '['  shift, and go to state 71
 
-    '('       [reduce using rule 131 (Primary)]
-    $default  reduce using rule 131 (Primary)
+    '('       [reduce using rule 132 (Primary)]
+    $default  reduce using rule 132 (Primary)
 
 
 State 31
 
-  130 Primary: BOOL_LIT •
+  131 Primary: BOOL_LIT •
 
-    $default  reduce using rule 130 (Primary)
+    $default  reduce using rule 131 (Primary)
 
 
 State 32
 
-  127 Primary: INT_LIT •
-
-    $default  reduce using rule 127 (Primary)
-
-
-State 33
-
-  128 Primary: FLOAT_LIT •
+  128 Primary: INT_LIT •
 
     $default  reduce using rule 128 (Primary)
 
 
+State 33
+
+  129 Primary: FLOAT_LIT •
+
+    $default  reduce using rule 129 (Primary)
+
+
 State 34
 
-   89 Expression: STR_LIT •
+   90 Expression: STR_LIT •
 
-    $default  reduce using rule 89 (Expression)
+    $default  reduce using rule 90 (Expression)
 
 
 State 35
 
-  118 TypeCast: '(' • VARIABLE_T ')' Unary
-  129 Primary: '(' • Expression ')'
+  119 TypeCast: '(' • VARIABLE_T ')' Unary
+  130 Primary: '(' • Expression ')'
 
     VARIABLE_T  shift, and go to state 72
     IDENT       shift, and go to state 30
@@ -941,7 +982,7 @@ State 35
 
 State 36
 
-  121 Unary: SUB • Unary
+  122 Unary: SUB • Unary
 
     IDENT      shift, and go to state 30
     BOOL_LIT   shift, and go to state 31
@@ -961,7 +1002,7 @@ State 36
 
 State 37
 
-  122 Unary: NOT • Unary
+  123 Unary: NOT • Unary
 
     IDENT      shift, and go to state 30
     BOOL_LIT   shift, and go to state 31
@@ -981,7 +1022,7 @@ State 37
 
 State 38
 
-  119 Unary: BNT • Unary
+  120 Unary: BNT • Unary
 
     IDENT      shift, and go to state 30
     BOOL_LIT   shift, and go to state 31
@@ -1001,7 +1042,7 @@ State 38
 
 State 39
 
-  120 Unary: ADD • Unary
+  121 Unary: ADD • Unary
 
     IDENT      shift, and go to state 30
     BOOL_LIT   shift, and go to state 31
@@ -1028,158 +1069,158 @@ State 40
 
 State 41
 
-   88 Expression: Or •
-   91 Or: Or • LOR And
+   89 Expression: Or •
+   92 Or: Or • LOR And
 
     LOR  shift, and go to state 80
 
-    $default  reduce using rule 88 (Expression)
+    $default  reduce using rule 89 (Expression)
 
 
 State 42
 
-   90 Or: And •
-   93 And: And • LAN BitwiseOr
+   91 Or: And •
+   94 And: And • LAN BitwiseOr
 
     LAN  shift, and go to state 81
 
-    $default  reduce using rule 90 (Or)
+    $default  reduce using rule 91 (Or)
 
 
 State 43
 
-   92 And: BitwiseOr •
-   95 BitwiseOr: BitwiseOr • BOR BitwiseXor
+   93 And: BitwiseOr •
+   96 BitwiseOr: BitwiseOr • BOR BitwiseXor
 
     BOR  shift, and go to state 82
 
-    $default  reduce using rule 92 (And)
+    $default  reduce using rule 93 (And)
 
 
 State 44
 
-   94 BitwiseOr: BitwiseXor •
-   97 BitwiseXor: BitwiseXor • BXO BitwiseAnd
+   95 BitwiseOr: BitwiseXor •
+   98 BitwiseXor: BitwiseXor • BXO BitwiseAnd
 
     BXO  shift, and go to state 83
 
-    $default  reduce using rule 94 (BitwiseOr)
+    $default  reduce using rule 95 (BitwiseOr)
 
 
 State 45
 
-   96 BitwiseXor: BitwiseAnd •
-   99 BitwiseAnd: BitwiseAnd • BAN Equality
+   97 BitwiseXor: BitwiseAnd •
+  100 BitwiseAnd: BitwiseAnd • BAN Equality
 
     BAN  shift, and go to state 84
 
-    $default  reduce using rule 96 (BitwiseXor)
+    $default  reduce using rule 97 (BitwiseXor)
 
 
 State 46
 
-   98 BitwiseAnd: Equality •
-  101 Equality: Equality • EQL Relational
-  102         | Equality • NEQ Relational
+   99 BitwiseAnd: Equality •
+  102 Equality: Equality • EQL Relational
+  103         | Equality • NEQ Relational
 
     EQL  shift, and go to state 85
     NEQ  shift, and go to state 86
 
-    $default  reduce using rule 98 (BitwiseAnd)
+    $default  reduce using rule 99 (BitwiseAnd)
 
 
 State 47
 
-  100 Equality: Relational •
-  104 Relational: Relational • LES Shift
-  105           | Relational • GTR Shift
-  106           | Relational • LEQ Shift
-  107           | Relational • GEQ Shift
+  101 Equality: Relational •
+  105 Relational: Relational • LES Shift
+  106           | Relational • GTR Shift
+  107           | Relational • LEQ Shift
+  108           | Relational • GEQ Shift
 
     GTR  shift, and go to state 87
     LES  shift, and go to state 88
     GEQ  shift, and go to state 89
     LEQ  shift, and go to state 90
 
-    $default  reduce using rule 100 (Equality)
+    $default  reduce using rule 101 (Equality)
 
 
 State 48
 
-  103 Relational: Shift •
-  109 Shift: Shift • SHR Additive
+  104 Relational: Shift •
+  110 Shift: Shift • SHR Additive
 
     SHR  shift, and go to state 91
 
-    $default  reduce using rule 103 (Relational)
+    $default  reduce using rule 104 (Relational)
 
 
 State 49
 
-  108 Shift: Additive •
-  111 Additive: Additive • ADD Multiplicative
-  112         | Additive • SUB Multiplicative
+  109 Shift: Additive •
+  112 Additive: Additive • ADD Multiplicative
+  113         | Additive • SUB Multiplicative
 
     SUB  shift, and go to state 92
     ADD  shift, and go to state 93
 
-    SUB       [reduce using rule 108 (Shift)]
-    ADD       [reduce using rule 108 (Shift)]
-    $default  reduce using rule 108 (Shift)
+    SUB       [reduce using rule 109 (Shift)]
+    ADD       [reduce using rule 109 (Shift)]
+    $default  reduce using rule 109 (Shift)
 
 
 State 50
 
-  110 Additive: Multiplicative •
-  114 Multiplicative: Multiplicative • MUL TypeCast
-  115               | Multiplicative • DIV TypeCast
-  116               | Multiplicative • REM TypeCast
+  111 Additive: Multiplicative •
+  115 Multiplicative: Multiplicative • MUL TypeCast
+  116               | Multiplicative • DIV TypeCast
+  117               | Multiplicative • REM TypeCast
 
     MUL  shift, and go to state 94
     DIV  shift, and go to state 95
     REM  shift, and go to state 96
 
-    $default  reduce using rule 110 (Additive)
+    $default  reduce using rule 111 (Additive)
 
 
 State 51
 
-  113 Multiplicative: TypeCast •
+  114 Multiplicative: TypeCast •
 
-    $default  reduce using rule 113 (Multiplicative)
+    $default  reduce using rule 114 (Multiplicative)
 
 
 State 52
 
-  117 TypeCast: Unary •
+  118 TypeCast: Unary •
 
-    $default  reduce using rule 117 (TypeCast)
+    $default  reduce using rule 118 (TypeCast)
 
 
 State 53
 
-  123 Unary: Post •
+  124 Unary: Post •
 
-    $default  reduce using rule 123 (Unary)
+    $default  reduce using rule 124 (Unary)
 
 
 State 54
 
-  124 Post: Primary •
-  125     | Primary • INC_ASSIGN
-  126     | Primary • DEC_ASSIGN
+  125 Post: Primary •
+  126     | Primary • INC_ASSIGN
+  127     | Primary • DEC_ASSIGN
 
     INC_ASSIGN  shift, and go to state 97
     DEC_ASSIGN  shift, and go to state 98
 
-    $default  reduce using rule 124 (Post)
+    $default  reduce using rule 125 (Post)
 
 
 State 55
 
-  132 Primary: FunctionCall •
+  133 Primary: FunctionCall •
 
-    $default  reduce using rule 132 (Primary)
+    $default  reduce using rule 133 (Primary)
 
 
 State 56
@@ -1196,12 +1237,12 @@ State 57
    70           | IDENT • '[' Expression ']'
    71           | IDENT • '[' Expression ']' '[' Expression ']'
    73           | IDENT • '[' Expression ']' $@16 VAL_ASSIGN '{' ArrayEles '}'
-  144 FunctionDefStmt: VARIABLE_T IDENT • $@21 '(' $@22 FunctionParameterStmtList ')' $@23 '{' GlobalStmtList '}'
+  145 FunctionDefStmt: VARIABLE_T IDENT • $@21 '(' $@22 FunctionParameterStmtList ')' $@23 '{' GlobalStmtList ReturnStmt '}'
 
     VAL_ASSIGN  shift, and go to state 99
     '['         shift, and go to state 100
 
-    '('       reduce using rule 141 ($@21)
+    '('       reduce using rule 142 ($@21)
     $default  reduce using rule 68 (Declarator)
 
     $@21  go to state 101
@@ -1225,7 +1266,7 @@ State 59
 
 State 60
 
-  137 FunctionCall: IDENT '(' • ArgumentList ')'
+  138 FunctionCall: IDENT '(' • ArgumentList ')'
 
     IDENT      shift, and go to state 30
     BOOL_LIT   shift, and go to state 31
@@ -1345,7 +1386,7 @@ State 66
 
 State 67
 
-   82 CoutStmt: COUT $@19 SHL • PrintableList ';'
+   83 CoutStmt: COUT $@19 SHL • PrintableList ';'
 
     ENDL       shift, and go to state 124
     IDENT      shift, and go to state 30
@@ -1460,30 +1501,30 @@ State 70
 
 State 71
 
-  134 Primary: IDENT '[' • @20 List
+  135 Primary: IDENT '[' • @20 List
 
-    $default  reduce using rule 133 (@20)
+    $default  reduce using rule 134 (@20)
 
     @20  go to state 139
 
 
 State 72
 
-  118 TypeCast: '(' VARIABLE_T • ')' Unary
+  119 TypeCast: '(' VARIABLE_T • ')' Unary
 
     ')'  shift, and go to state 140
 
 
 State 73
 
-  129 Primary: '(' Expression • ')'
+  130 Primary: '(' Expression • ')'
 
     ')'  shift, and go to state 141
 
 
 State 74
 
-  129 Primary: '(' • Expression ')'
+  130 Primary: '(' • Expression ')'
 
     IDENT      shift, and go to state 30
     BOOL_LIT   shift, and go to state 31
@@ -1516,30 +1557,30 @@ State 74
 
 State 75
 
-  121 Unary: SUB Unary •
-
-    $default  reduce using rule 121 (Unary)
-
-
-State 76
-
-  122 Unary: NOT Unary •
+  122 Unary: SUB Unary •
 
     $default  reduce using rule 122 (Unary)
 
 
+State 76
+
+  123 Unary: NOT Unary •
+
+    $default  reduce using rule 123 (Unary)
+
+
 State 77
 
-  119 Unary: BNT Unary •
+  120 Unary: BNT Unary •
 
-    $default  reduce using rule 119 (Unary)
+    $default  reduce using rule 120 (Unary)
 
 
 State 78
 
-  120 Unary: ADD Unary •
+  121 Unary: ADD Unary •
 
-    $default  reduce using rule 120 (Unary)
+    $default  reduce using rule 121 (Unary)
 
 
 State 79
@@ -1551,7 +1592,7 @@ State 79
 
 State 80
 
-   91 Or: Or LOR • And
+   92 Or: Or LOR • And
 
     IDENT      shift, and go to state 30
     BOOL_LIT   shift, and go to state 31
@@ -1581,7 +1622,7 @@ State 80
 
 State 81
 
-   93 And: And LAN • BitwiseOr
+   94 And: And LAN • BitwiseOr
 
     IDENT      shift, and go to state 30
     BOOL_LIT   shift, and go to state 31
@@ -1610,7 +1651,7 @@ State 81
 
 State 82
 
-   95 BitwiseOr: BitwiseOr BOR • BitwiseXor
+   96 BitwiseOr: BitwiseOr BOR • BitwiseXor
 
     IDENT      shift, and go to state 30
     BOOL_LIT   shift, and go to state 31
@@ -1638,7 +1679,7 @@ State 82
 
 State 83
 
-   97 BitwiseXor: BitwiseXor BXO • BitwiseAnd
+   98 BitwiseXor: BitwiseXor BXO • BitwiseAnd
 
     IDENT      shift, and go to state 30
     BOOL_LIT   shift, and go to state 31
@@ -1665,7 +1706,7 @@ State 83
 
 State 84
 
-   99 BitwiseAnd: BitwiseAnd BAN • Equality
+  100 BitwiseAnd: BitwiseAnd BAN • Equality
 
     IDENT      shift, and go to state 30
     BOOL_LIT   shift, and go to state 31
@@ -1691,7 +1732,7 @@ State 84
 
 State 85
 
-  101 Equality: Equality EQL • Relational
+  102 Equality: Equality EQL • Relational
 
     IDENT      shift, and go to state 30
     BOOL_LIT   shift, and go to state 31
@@ -1716,7 +1757,7 @@ State 85
 
 State 86
 
-  102 Equality: Equality NEQ • Relational
+  103 Equality: Equality NEQ • Relational
 
     IDENT      shift, and go to state 30
     BOOL_LIT   shift, and go to state 31
@@ -1741,7 +1782,7 @@ State 86
 
 State 87
 
-  105 Relational: Relational GTR • Shift
+  106 Relational: Relational GTR • Shift
 
     IDENT      shift, and go to state 30
     BOOL_LIT   shift, and go to state 31
@@ -1765,7 +1806,7 @@ State 87
 
 State 88
 
-  104 Relational: Relational LES • Shift
+  105 Relational: Relational LES • Shift
 
     IDENT      shift, and go to state 30
     BOOL_LIT   shift, and go to state 31
@@ -1789,7 +1830,7 @@ State 88
 
 State 89
 
-  107 Relational: Relational GEQ • Shift
+  108 Relational: Relational GEQ • Shift
 
     IDENT      shift, and go to state 30
     BOOL_LIT   shift, and go to state 31
@@ -1813,7 +1854,7 @@ State 89
 
 State 90
 
-  106 Relational: Relational LEQ • Shift
+  107 Relational: Relational LEQ • Shift
 
     IDENT      shift, and go to state 30
     BOOL_LIT   shift, and go to state 31
@@ -1837,7 +1878,7 @@ State 90
 
 State 91
 
-  109 Shift: Shift SHR • Additive
+  110 Shift: Shift SHR • Additive
 
     IDENT      shift, and go to state 30
     BOOL_LIT   shift, and go to state 31
@@ -1860,7 +1901,7 @@ State 91
 
 State 92
 
-  112 Additive: Additive SUB • Multiplicative
+  113 Additive: Additive SUB • Multiplicative
 
     IDENT      shift, and go to state 30
     BOOL_LIT   shift, and go to state 31
@@ -1882,7 +1923,7 @@ State 92
 
 State 93
 
-  111 Additive: Additive ADD • Multiplicative
+  112 Additive: Additive ADD • Multiplicative
 
     IDENT      shift, and go to state 30
     BOOL_LIT   shift, and go to state 31
@@ -1904,7 +1945,7 @@ State 93
 
 State 94
 
-  114 Multiplicative: Multiplicative MUL • TypeCast
+  115 Multiplicative: Multiplicative MUL • TypeCast
 
     IDENT      shift, and go to state 30
     BOOL_LIT   shift, and go to state 31
@@ -1925,7 +1966,7 @@ State 94
 
 State 95
 
-  115 Multiplicative: Multiplicative DIV • TypeCast
+  116 Multiplicative: Multiplicative DIV • TypeCast
 
     IDENT      shift, and go to state 30
     BOOL_LIT   shift, and go to state 31
@@ -1946,7 +1987,7 @@ State 95
 
 State 96
 
-  116 Multiplicative: Multiplicative REM • TypeCast
+  117 Multiplicative: Multiplicative REM • TypeCast
 
     IDENT      shift, and go to state 30
     BOOL_LIT   shift, and go to state 31
@@ -1967,16 +2008,16 @@ State 96
 
 State 97
 
-  125 Post: Primary INC_ASSIGN •
+  126 Post: Primary INC_ASSIGN •
 
-    $default  reduce using rule 125 (Post)
+    $default  reduce using rule 126 (Post)
 
 
 State 98
 
-  126 Post: Primary DEC_ASSIGN •
+  127 Post: Primary DEC_ASSIGN •
 
-    $default  reduce using rule 126 (Post)
+    $default  reduce using rule 127 (Post)
 
 
 State 99
@@ -2050,7 +2091,7 @@ State 100
 
 State 101
 
-  144 FunctionDefStmt: VARIABLE_T IDENT $@21 • '(' $@22 FunctionParameterStmtList ')' $@23 '{' GlobalStmtList '}'
+  145 FunctionDefStmt: VARIABLE_T IDENT $@21 • '(' $@22 FunctionParameterStmtList ')' $@23 '{' GlobalStmtList ReturnStmt '}'
 
     '('  shift, and go to state 161
 
@@ -2073,26 +2114,26 @@ State 103
 
 State 104
 
-  139 ArgumentListNonEmpty: Expression •
+  140 ArgumentListNonEmpty: Expression •
 
-    $default  reduce using rule 139 (ArgumentListNonEmpty)
+    $default  reduce using rule 140 (ArgumentListNonEmpty)
 
 
 State 105
 
-  137 FunctionCall: IDENT '(' ArgumentList • ')'
+  138 FunctionCall: IDENT '(' ArgumentList • ')'
 
     ')'  shift, and go to state 164
 
 
 State 106
 
-  138 ArgumentList: ArgumentListNonEmpty •
-  140 ArgumentListNonEmpty: ArgumentListNonEmpty • ',' Expression
+  139 ArgumentList: ArgumentListNonEmpty •
+  141 ArgumentListNonEmpty: ArgumentListNonEmpty • ',' Expression
 
     ','  shift, and go to state 165
 
-    $default  reduce using rule 138 (ArgumentList)
+    $default  reduce using rule 139 (ArgumentList)
 
 
 State 107
@@ -2638,38 +2679,38 @@ State 118
 State 119
 
    63 Assignable: STR_LIT •
-   89 Expression: STR_LIT •
+   90 Expression: STR_LIT •
 
     ')'         reduce using rule 63 (Assignable)
-    ')'         [reduce using rule 89 (Expression)]
+    ')'         [reduce using rule 90 (Expression)]
     ';'         reduce using rule 63 (Assignable)
-    ';'         [reduce using rule 89 (Expression)]
+    ';'         [reduce using rule 90 (Expression)]
     '}'         reduce using rule 63 (Assignable)
-    '}'         [reduce using rule 89 (Expression)]
+    '}'         [reduce using rule 90 (Expression)]
     VARIABLE_T  reduce using rule 63 (Assignable)
-    VARIABLE_T  [reduce using rule 89 (Expression)]
+    VARIABLE_T  [reduce using rule 90 (Expression)]
     IDENT       reduce using rule 63 (Assignable)
-    IDENT       [reduce using rule 89 (Expression)]
+    IDENT       [reduce using rule 90 (Expression)]
     BOOL_LIT    reduce using rule 63 (Assignable)
-    BOOL_LIT    [reduce using rule 89 (Expression)]
+    BOOL_LIT    [reduce using rule 90 (Expression)]
     INT_LIT     reduce using rule 63 (Assignable)
-    INT_LIT     [reduce using rule 89 (Expression)]
+    INT_LIT     [reduce using rule 90 (Expression)]
     FLOAT_LIT   reduce using rule 63 (Assignable)
-    FLOAT_LIT   [reduce using rule 89 (Expression)]
+    FLOAT_LIT   [reduce using rule 90 (Expression)]
     STR_LIT     reduce using rule 63 (Assignable)
-    STR_LIT     [reduce using rule 89 (Expression)]
+    STR_LIT     [reduce using rule 90 (Expression)]
     '('         reduce using rule 63 (Assignable)
-    '('         [reduce using rule 89 (Expression)]
+    '('         [reduce using rule 90 (Expression)]
     SUB         reduce using rule 63 (Assignable)
-    SUB         [reduce using rule 89 (Expression)]
+    SUB         [reduce using rule 90 (Expression)]
     NOT         reduce using rule 63 (Assignable)
-    NOT         [reduce using rule 89 (Expression)]
+    NOT         [reduce using rule 90 (Expression)]
     BNT         reduce using rule 63 (Assignable)
-    BNT         [reduce using rule 89 (Expression)]
+    BNT         [reduce using rule 90 (Expression)]
     ADD         reduce using rule 63 (Assignable)
-    ADD         [reduce using rule 89 (Expression)]
+    ADD         [reduce using rule 90 (Expression)]
     ','         reduce using rule 63 (Assignable)
-    ','         [reduce using rule 89 (Expression)]
+    ','         [reduce using rule 90 (Expression)]
     $default    reduce using rule 63 (Assignable)
 
 
@@ -2708,6 +2749,16 @@ State 123
     VARIABLE_T  shift, and go to state 10
     IDENT       shift, and go to state 11
 
+    COUT        [reduce using rule 81 (ReturnStmt)]
+    IF          [reduce using rule 81 (ReturnStmt)]
+    FOR         [reduce using rule 81 (ReturnStmt)]
+    WHILE       [reduce using rule 81 (ReturnStmt)]
+    RETURN      [reduce using rule 81 (ReturnStmt)]
+    BREAK       [reduce using rule 81 (ReturnStmt)]
+    VARIABLE_T  [reduce using rule 81 (ReturnStmt)]
+    IDENT       [reduce using rule 81 (ReturnStmt)]
+    $default    reduce using rule 81 (ReturnStmt)
+
     GlobalStmt          go to state 180
     FunctionCallStmt    go to state 14
     JumpStmt            go to state 15
@@ -2725,27 +2776,27 @@ State 123
 
 State 124
 
-   86 Printable: ENDL •
+   87 Printable: ENDL •
 
-    $default  reduce using rule 86 (Printable)
+    $default  reduce using rule 87 (Printable)
 
 
 State 125
 
-   85 Printable: STR_LIT •
-   89 Expression: STR_LIT •
+   86 Printable: STR_LIT •
+   90 Expression: STR_LIT •
 
-    SHL       reduce using rule 85 (Printable)
-    SHL       [reduce using rule 89 (Expression)]
-    ';'       reduce using rule 85 (Printable)
-    ';'       [reduce using rule 89 (Expression)]
-    $default  reduce using rule 85 (Printable)
+    SHL       reduce using rule 86 (Printable)
+    SHL       [reduce using rule 90 (Expression)]
+    ';'       reduce using rule 86 (Printable)
+    ';'       [reduce using rule 90 (Expression)]
+    $default  reduce using rule 86 (Printable)
 
 
 State 126
 
-   82 CoutStmt: COUT $@19 SHL PrintableList • ';'
-   84 PrintableList: PrintableList • SHL Printable
+   83 CoutStmt: COUT $@19 SHL PrintableList • ';'
+   85 PrintableList: PrintableList • SHL Printable
 
     SHL  shift, and go to state 182
     ';'  shift, and go to state 183
@@ -2753,16 +2804,16 @@ State 126
 
 State 127
 
-   83 PrintableList: Printable •
+   84 PrintableList: Printable •
 
-    $default  reduce using rule 83 (PrintableList)
+    $default  reduce using rule 84 (PrintableList)
 
 
 State 128
 
-   87 Printable: Expression •
+   88 Printable: Expression •
 
-    $default  reduce using rule 87 (Printable)
+    $default  reduce using rule 88 (Printable)
 
 
 State 129
@@ -2796,53 +2847,53 @@ State 132
 
    44 AssignBody: IDENT • $@12 Assign
    46           | IDENT • '[' @13 AssignList
-  131 Primary: IDENT •
-  134        | IDENT • '[' @20 List
-  137 FunctionCall: IDENT • '(' ArgumentList ')'
+  132 Primary: IDENT •
+  135        | IDENT • '[' @20 List
+  138 FunctionCall: IDENT • '(' ArgumentList ')'
 
     '('  shift, and go to state 60
     '['  shift, and go to state 186
 
-    SHR         reduce using rule 131 (Primary)
-    BAN         reduce using rule 131 (Primary)
-    BOR         reduce using rule 131 (Primary)
-    BXO         reduce using rule 131 (Primary)
-    MUL         reduce using rule 131 (Primary)
-    DIV         reduce using rule 131 (Primary)
-    REM         reduce using rule 131 (Primary)
-    GTR         reduce using rule 131 (Primary)
-    LES         reduce using rule 131 (Primary)
-    GEQ         reduce using rule 131 (Primary)
-    LEQ         reduce using rule 131 (Primary)
-    EQL         reduce using rule 131 (Primary)
-    NEQ         reduce using rule 131 (Primary)
-    LAN         reduce using rule 131 (Primary)
-    LOR         reduce using rule 131 (Primary)
-    INC_ASSIGN  reduce using rule 131 (Primary)
-    DEC_ASSIGN  reduce using rule 131 (Primary)
-    ')'         reduce using rule 131 (Primary)
-    ';'         reduce using rule 131 (Primary)
-    VARIABLE_T  reduce using rule 131 (Primary)
+    SHR         reduce using rule 132 (Primary)
+    BAN         reduce using rule 132 (Primary)
+    BOR         reduce using rule 132 (Primary)
+    BXO         reduce using rule 132 (Primary)
+    MUL         reduce using rule 132 (Primary)
+    DIV         reduce using rule 132 (Primary)
+    REM         reduce using rule 132 (Primary)
+    GTR         reduce using rule 132 (Primary)
+    LES         reduce using rule 132 (Primary)
+    GEQ         reduce using rule 132 (Primary)
+    LEQ         reduce using rule 132 (Primary)
+    EQL         reduce using rule 132 (Primary)
+    NEQ         reduce using rule 132 (Primary)
+    LAN         reduce using rule 132 (Primary)
+    LOR         reduce using rule 132 (Primary)
+    INC_ASSIGN  reduce using rule 132 (Primary)
+    DEC_ASSIGN  reduce using rule 132 (Primary)
+    ')'         reduce using rule 132 (Primary)
+    ';'         reduce using rule 132 (Primary)
+    VARIABLE_T  reduce using rule 132 (Primary)
     IDENT       reduce using rule 43 ($@12)
-    IDENT       [reduce using rule 131 (Primary)]
+    IDENT       [reduce using rule 132 (Primary)]
     BOOL_LIT    reduce using rule 43 ($@12)
-    BOOL_LIT    [reduce using rule 131 (Primary)]
+    BOOL_LIT    [reduce using rule 132 (Primary)]
     INT_LIT     reduce using rule 43 ($@12)
-    INT_LIT     [reduce using rule 131 (Primary)]
+    INT_LIT     [reduce using rule 132 (Primary)]
     FLOAT_LIT   reduce using rule 43 ($@12)
-    FLOAT_LIT   [reduce using rule 131 (Primary)]
+    FLOAT_LIT   [reduce using rule 132 (Primary)]
     STR_LIT     reduce using rule 43 ($@12)
-    STR_LIT     [reduce using rule 131 (Primary)]
+    STR_LIT     [reduce using rule 132 (Primary)]
     '('         [reduce using rule 43 ($@12)]
-    '('         [reduce using rule 131 (Primary)]
+    '('         [reduce using rule 132 (Primary)]
     SUB         reduce using rule 43 ($@12)
-    SUB         [reduce using rule 131 (Primary)]
+    SUB         [reduce using rule 132 (Primary)]
     NOT         reduce using rule 43 ($@12)
-    NOT         [reduce using rule 131 (Primary)]
+    NOT         [reduce using rule 132 (Primary)]
     BNT         reduce using rule 43 ($@12)
-    BNT         [reduce using rule 131 (Primary)]
+    BNT         [reduce using rule 132 (Primary)]
     ADD         reduce using rule 43 ($@12)
-    ADD         [reduce using rule 131 (Primary)]
+    ADD         [reduce using rule 132 (Primary)]
     $default    reduce using rule 43 ($@12)
 
     $@12  go to state 62
@@ -2898,7 +2949,7 @@ State 138
 
 State 139
 
-  134 Primary: IDENT '[' @20 • List
+  135 Primary: IDENT '[' @20 • List
 
     IDENT      shift, and go to state 30
     BOOL_LIT   shift, and go to state 31
@@ -2932,7 +2983,7 @@ State 139
 
 State 140
 
-  118 TypeCast: '(' VARIABLE_T ')' • Unary
+  119 TypeCast: '(' VARIABLE_T ')' • Unary
 
     IDENT      shift, and go to state 30
     BOOL_LIT   shift, and go to state 31
@@ -2952,86 +3003,70 @@ State 140
 
 State 141
 
-  129 Primary: '(' Expression ')' •
+  130 Primary: '(' Expression ')' •
 
-    $default  reduce using rule 129 (Primary)
+    $default  reduce using rule 130 (Primary)
 
 
 State 142
 
-   91 Or: Or LOR And •
-   93 And: And • LAN BitwiseOr
+   92 Or: Or LOR And •
+   94 And: And • LAN BitwiseOr
 
     LAN  shift, and go to state 81
 
-    $default  reduce using rule 91 (Or)
+    $default  reduce using rule 92 (Or)
 
 
 State 143
 
-   93 And: And LAN BitwiseOr •
-   95 BitwiseOr: BitwiseOr • BOR BitwiseXor
+   94 And: And LAN BitwiseOr •
+   96 BitwiseOr: BitwiseOr • BOR BitwiseXor
 
     BOR  shift, and go to state 82
 
-    $default  reduce using rule 93 (And)
+    $default  reduce using rule 94 (And)
 
 
 State 144
 
-   95 BitwiseOr: BitwiseOr BOR BitwiseXor •
-   97 BitwiseXor: BitwiseXor • BXO BitwiseAnd
+   96 BitwiseOr: BitwiseOr BOR BitwiseXor •
+   98 BitwiseXor: BitwiseXor • BXO BitwiseAnd
 
     BXO  shift, and go to state 83
 
-    $default  reduce using rule 95 (BitwiseOr)
+    $default  reduce using rule 96 (BitwiseOr)
 
 
 State 145
 
-   97 BitwiseXor: BitwiseXor BXO BitwiseAnd •
-   99 BitwiseAnd: BitwiseAnd • BAN Equality
+   98 BitwiseXor: BitwiseXor BXO BitwiseAnd •
+  100 BitwiseAnd: BitwiseAnd • BAN Equality
 
     BAN  shift, and go to state 84
 
-    $default  reduce using rule 97 (BitwiseXor)
+    $default  reduce using rule 98 (BitwiseXor)
 
 
 State 146
 
-   99 BitwiseAnd: BitwiseAnd BAN Equality •
-  101 Equality: Equality • EQL Relational
-  102         | Equality • NEQ Relational
+  100 BitwiseAnd: BitwiseAnd BAN Equality •
+  102 Equality: Equality • EQL Relational
+  103         | Equality • NEQ Relational
 
     EQL  shift, and go to state 85
     NEQ  shift, and go to state 86
 
-    $default  reduce using rule 99 (BitwiseAnd)
+    $default  reduce using rule 100 (BitwiseAnd)
 
 
 State 147
 
-  101 Equality: Equality EQL Relational •
-  104 Relational: Relational • LES Shift
-  105           | Relational • GTR Shift
-  106           | Relational • LEQ Shift
-  107           | Relational • GEQ Shift
-
-    GTR  shift, and go to state 87
-    LES  shift, and go to state 88
-    GEQ  shift, and go to state 89
-    LEQ  shift, and go to state 90
-
-    $default  reduce using rule 101 (Equality)
-
-
-State 148
-
-  102 Equality: Equality NEQ Relational •
-  104 Relational: Relational • LES Shift
-  105           | Relational • GTR Shift
-  106           | Relational • LEQ Shift
-  107           | Relational • GEQ Shift
+  102 Equality: Equality EQL Relational •
+  105 Relational: Relational • LES Shift
+  106           | Relational • GTR Shift
+  107           | Relational • LEQ Shift
+  108           | Relational • GEQ Shift
 
     GTR  shift, and go to state 87
     LES  shift, and go to state 88
@@ -3041,66 +3076,96 @@ State 148
     $default  reduce using rule 102 (Equality)
 
 
+State 148
+
+  103 Equality: Equality NEQ Relational •
+  105 Relational: Relational • LES Shift
+  106           | Relational • GTR Shift
+  107           | Relational • LEQ Shift
+  108           | Relational • GEQ Shift
+
+    GTR  shift, and go to state 87
+    LES  shift, and go to state 88
+    GEQ  shift, and go to state 89
+    LEQ  shift, and go to state 90
+
+    $default  reduce using rule 103 (Equality)
+
+
 State 149
 
-  105 Relational: Relational GTR Shift •
-  109 Shift: Shift • SHR Additive
-
-    SHR  shift, and go to state 91
-
-    $default  reduce using rule 105 (Relational)
-
-
-State 150
-
-  104 Relational: Relational LES Shift •
-  109 Shift: Shift • SHR Additive
-
-    SHR  shift, and go to state 91
-
-    $default  reduce using rule 104 (Relational)
-
-
-State 151
-
-  107 Relational: Relational GEQ Shift •
-  109 Shift: Shift • SHR Additive
-
-    SHR  shift, and go to state 91
-
-    $default  reduce using rule 107 (Relational)
-
-
-State 152
-
-  106 Relational: Relational LEQ Shift •
-  109 Shift: Shift • SHR Additive
+  106 Relational: Relational GTR Shift •
+  110 Shift: Shift • SHR Additive
 
     SHR  shift, and go to state 91
 
     $default  reduce using rule 106 (Relational)
 
 
+State 150
+
+  105 Relational: Relational LES Shift •
+  110 Shift: Shift • SHR Additive
+
+    SHR  shift, and go to state 91
+
+    $default  reduce using rule 105 (Relational)
+
+
+State 151
+
+  108 Relational: Relational GEQ Shift •
+  110 Shift: Shift • SHR Additive
+
+    SHR  shift, and go to state 91
+
+    $default  reduce using rule 108 (Relational)
+
+
+State 152
+
+  107 Relational: Relational LEQ Shift •
+  110 Shift: Shift • SHR Additive
+
+    SHR  shift, and go to state 91
+
+    $default  reduce using rule 107 (Relational)
+
+
 State 153
 
-  109 Shift: Shift SHR Additive •
-  111 Additive: Additive • ADD Multiplicative
-  112         | Additive • SUB Multiplicative
+  110 Shift: Shift SHR Additive •
+  112 Additive: Additive • ADD Multiplicative
+  113         | Additive • SUB Multiplicative
 
     SUB  shift, and go to state 92
     ADD  shift, and go to state 93
 
-    SUB       [reduce using rule 109 (Shift)]
-    ADD       [reduce using rule 109 (Shift)]
-    $default  reduce using rule 109 (Shift)
+    SUB       [reduce using rule 110 (Shift)]
+    ADD       [reduce using rule 110 (Shift)]
+    $default  reduce using rule 110 (Shift)
 
 
 State 154
 
-  112 Additive: Additive SUB Multiplicative •
-  114 Multiplicative: Multiplicative • MUL TypeCast
-  115               | Multiplicative • DIV TypeCast
-  116               | Multiplicative • REM TypeCast
+  113 Additive: Additive SUB Multiplicative •
+  115 Multiplicative: Multiplicative • MUL TypeCast
+  116               | Multiplicative • DIV TypeCast
+  117               | Multiplicative • REM TypeCast
+
+    MUL  shift, and go to state 94
+    DIV  shift, and go to state 95
+    REM  shift, and go to state 96
+
+    $default  reduce using rule 113 (Additive)
+
+
+State 155
+
+  112 Additive: Additive ADD Multiplicative •
+  115 Multiplicative: Multiplicative • MUL TypeCast
+  116               | Multiplicative • DIV TypeCast
+  117               | Multiplicative • REM TypeCast
 
     MUL  shift, and go to state 94
     DIV  shift, and go to state 95
@@ -3109,39 +3174,25 @@ State 154
     $default  reduce using rule 112 (Additive)
 
 
-State 155
-
-  111 Additive: Additive ADD Multiplicative •
-  114 Multiplicative: Multiplicative • MUL TypeCast
-  115               | Multiplicative • DIV TypeCast
-  116               | Multiplicative • REM TypeCast
-
-    MUL  shift, and go to state 94
-    DIV  shift, and go to state 95
-    REM  shift, and go to state 96
-
-    $default  reduce using rule 111 (Additive)
-
-
 State 156
 
-  114 Multiplicative: Multiplicative MUL TypeCast •
-
-    $default  reduce using rule 114 (Multiplicative)
-
-
-State 157
-
-  115 Multiplicative: Multiplicative DIV TypeCast •
+  115 Multiplicative: Multiplicative MUL TypeCast •
 
     $default  reduce using rule 115 (Multiplicative)
 
 
-State 158
+State 157
 
-  116 Multiplicative: Multiplicative REM TypeCast •
+  116 Multiplicative: Multiplicative DIV TypeCast •
 
     $default  reduce using rule 116 (Multiplicative)
+
+
+State 158
+
+  117 Multiplicative: Multiplicative REM TypeCast •
+
+    $default  reduce using rule 117 (Multiplicative)
 
 
 State 159
@@ -3162,9 +3213,9 @@ State 160
 
 State 161
 
-  144 FunctionDefStmt: VARIABLE_T IDENT $@21 '(' • $@22 FunctionParameterStmtList ')' $@23 '{' GlobalStmtList '}'
+  145 FunctionDefStmt: VARIABLE_T IDENT $@21 '(' • $@22 FunctionParameterStmtList ')' $@23 '{' GlobalStmtList ReturnStmt '}'
 
-    $default  reduce using rule 142 ($@22)
+    $default  reduce using rule 143 ($@22)
 
     $@22  go to state 195
 
@@ -3192,14 +3243,14 @@ State 163
 
 State 164
 
-  137 FunctionCall: IDENT '(' ArgumentList ')' •
+  138 FunctionCall: IDENT '(' ArgumentList ')' •
 
-    $default  reduce using rule 137 (FunctionCall)
+    $default  reduce using rule 138 (FunctionCall)
 
 
 State 165
 
-  140 ArgumentListNonEmpty: ArgumentListNonEmpty ',' • Expression
+  141 ArgumentListNonEmpty: ArgumentListNonEmpty ',' • Expression
 
     IDENT      shift, and go to state 30
     BOOL_LIT   shift, and go to state 31
@@ -3347,7 +3398,7 @@ State 181
 
 State 182
 
-   84 PrintableList: PrintableList SHL • Printable
+   85 PrintableList: PrintableList SHL • Printable
 
     ENDL       shift, and go to state 124
     IDENT      shift, and go to state 30
@@ -3382,9 +3433,9 @@ State 182
 
 State 183
 
-   82 CoutStmt: COUT $@19 SHL PrintableList ';' •
+   83 CoutStmt: COUT $@19 SHL PrintableList ';' •
 
-    $default  reduce using rule 82 (CoutStmt)
+    $default  reduce using rule 83 (CoutStmt)
 
 
 State 184
@@ -3400,6 +3451,16 @@ State 184
     '{'         shift, and go to state 179
     VARIABLE_T  shift, and go to state 10
     IDENT       shift, and go to state 11
+
+    COUT        [reduce using rule 81 (ReturnStmt)]
+    IF          [reduce using rule 81 (ReturnStmt)]
+    FOR         [reduce using rule 81 (ReturnStmt)]
+    WHILE       [reduce using rule 81 (ReturnStmt)]
+    RETURN      [reduce using rule 81 (ReturnStmt)]
+    BREAK       [reduce using rule 81 (ReturnStmt)]
+    VARIABLE_T  [reduce using rule 81 (ReturnStmt)]
+    IDENT       [reduce using rule 81 (ReturnStmt)]
+    $default    reduce using rule 81 (ReturnStmt)
 
     GlobalStmt          go to state 180
     FunctionCallStmt    go to state 14
@@ -3435,28 +3496,28 @@ State 185
 State 186
 
    46 AssignBody: IDENT '[' • @13 AssignList
-  134 Primary: IDENT '[' • @20 List
+  135 Primary: IDENT '[' • @20 List
 
     IDENT      reduce using rule 45 (@13)
-    IDENT      [reduce using rule 133 (@20)]
+    IDENT      [reduce using rule 134 (@20)]
     BOOL_LIT   reduce using rule 45 (@13)
-    BOOL_LIT   [reduce using rule 133 (@20)]
+    BOOL_LIT   [reduce using rule 134 (@20)]
     INT_LIT    reduce using rule 45 (@13)
-    INT_LIT    [reduce using rule 133 (@20)]
+    INT_LIT    [reduce using rule 134 (@20)]
     FLOAT_LIT  reduce using rule 45 (@13)
-    FLOAT_LIT  [reduce using rule 133 (@20)]
+    FLOAT_LIT  [reduce using rule 134 (@20)]
     STR_LIT    reduce using rule 45 (@13)
-    STR_LIT    [reduce using rule 133 (@20)]
+    STR_LIT    [reduce using rule 134 (@20)]
     '('        reduce using rule 45 (@13)
-    '('        [reduce using rule 133 (@20)]
+    '('        [reduce using rule 134 (@20)]
     SUB        reduce using rule 45 (@13)
-    SUB        [reduce using rule 133 (@20)]
+    SUB        [reduce using rule 134 (@20)]
     NOT        reduce using rule 45 (@13)
-    NOT        [reduce using rule 133 (@20)]
+    NOT        [reduce using rule 134 (@20)]
     BNT        reduce using rule 45 (@13)
-    BNT        [reduce using rule 133 (@20)]
+    BNT        [reduce using rule 134 (@20)]
     ADD        reduce using rule 45 (@13)
-    ADD        [reduce using rule 133 (@20)]
+    ADD        [reduce using rule 134 (@20)]
     $default   reduce using rule 45 (@13)
 
     @13  go to state 107
@@ -3528,24 +3589,24 @@ State 190
 
 State 191
 
-  135 List: Expression • ']'
-  136     | Expression • ']' '[' Expression ']'
+  136 List: Expression • ']'
+  137     | Expression • ']' '[' Expression ']'
 
     ']'  shift, and go to state 206
 
 
 State 192
 
-  134 Primary: IDENT '[' @20 List •
+  135 Primary: IDENT '[' @20 List •
 
-    $default  reduce using rule 134 (Primary)
+    $default  reduce using rule 135 (Primary)
 
 
 State 193
 
-  118 TypeCast: '(' VARIABLE_T ')' Unary •
+  119 TypeCast: '(' VARIABLE_T ')' Unary •
 
-    $default  reduce using rule 118 (TypeCast)
+    $default  reduce using rule 119 (TypeCast)
 
 
 State 194
@@ -3564,11 +3625,11 @@ State 194
 
 State 195
 
-  144 FunctionDefStmt: VARIABLE_T IDENT $@21 '(' $@22 • FunctionParameterStmtList ')' $@23 '{' GlobalStmtList '}'
+  145 FunctionDefStmt: VARIABLE_T IDENT $@21 '(' $@22 • FunctionParameterStmtList ')' $@23 '{' GlobalStmtList ReturnStmt '}'
 
     VARIABLE_T  shift, and go to state 209
 
-    $default  reduce using rule 147 (FunctionParameterStmtList)
+    $default  reduce using rule 148 (FunctionParameterStmtList)
 
     FunctionParameterStmtList  go to state 210
     FunctionParameterStmt      go to state 211
@@ -3576,9 +3637,9 @@ State 195
 
 State 196
 
-  140 ArgumentListNonEmpty: ArgumentListNonEmpty ',' Expression •
+  141 ArgumentListNonEmpty: ArgumentListNonEmpty ',' Expression •
 
-    $default  reduce using rule 140 (ArgumentListNonEmpty)
+    $default  reduce using rule 141 (ArgumentListNonEmpty)
 
 
 State 197
@@ -3606,6 +3667,16 @@ State 198
     VARIABLE_T  shift, and go to state 10
     IDENT       shift, and go to state 11
 
+    COUT        [reduce using rule 81 (ReturnStmt)]
+    IF          [reduce using rule 81 (ReturnStmt)]
+    FOR         [reduce using rule 81 (ReturnStmt)]
+    WHILE       [reduce using rule 81 (ReturnStmt)]
+    RETURN      [reduce using rule 81 (ReturnStmt)]
+    BREAK       [reduce using rule 81 (ReturnStmt)]
+    VARIABLE_T  [reduce using rule 81 (ReturnStmt)]
+    IDENT       [reduce using rule 81 (ReturnStmt)]
+    $default    reduce using rule 81 (ReturnStmt)
+
     GlobalStmtList      go to state 214
     GlobalStmt          go to state 13
     FunctionCallStmt    go to state 14
@@ -3623,9 +3694,9 @@ State 198
 
 State 199
 
-   84 PrintableList: PrintableList SHL Printable •
+   85 PrintableList: PrintableList SHL Printable •
 
-    $default  reduce using rule 84 (PrintableList)
+    $default  reduce using rule 85 (PrintableList)
 
 
 State 200
@@ -3655,6 +3726,16 @@ State 202
     '{'         shift, and go to state 216
     VARIABLE_T  shift, and go to state 10
     IDENT       shift, and go to state 11
+
+    COUT        [reduce using rule 81 (ReturnStmt)]
+    IF          [reduce using rule 81 (ReturnStmt)]
+    FOR         [reduce using rule 81 (ReturnStmt)]
+    WHILE       [reduce using rule 81 (ReturnStmt)]
+    RETURN      [reduce using rule 81 (ReturnStmt)]
+    BREAK       [reduce using rule 81 (ReturnStmt)]
+    VARIABLE_T  [reduce using rule 81 (ReturnStmt)]
+    IDENT       [reduce using rule 81 (ReturnStmt)]
+    $default    reduce using rule 81 (ReturnStmt)
 
     GlobalStmtList      go to state 217
     GlobalStmt          go to state 13
@@ -3705,6 +3786,16 @@ State 205
     VARIABLE_T  shift, and go to state 10
     IDENT       shift, and go to state 11
 
+    COUT        [reduce using rule 81 (ReturnStmt)]
+    IF          [reduce using rule 81 (ReturnStmt)]
+    FOR         [reduce using rule 81 (ReturnStmt)]
+    WHILE       [reduce using rule 81 (ReturnStmt)]
+    RETURN      [reduce using rule 81 (ReturnStmt)]
+    BREAK       [reduce using rule 81 (ReturnStmt)]
+    VARIABLE_T  [reduce using rule 81 (ReturnStmt)]
+    IDENT       [reduce using rule 81 (ReturnStmt)]
+    $default    reduce using rule 81 (ReturnStmt)
+
     GlobalStmtList      go to state 217
     GlobalStmt          go to state 13
     FunctionCallStmt    go to state 14
@@ -3723,12 +3814,12 @@ State 205
 
 State 206
 
-  135 List: Expression ']' •
-  136     | Expression ']' • '[' Expression ']'
+  136 List: Expression ']' •
+  137     | Expression ']' • '[' Expression ']'
 
     '['  shift, and go to state 221
 
-    $default  reduce using rule 135 (List)
+    $default  reduce using rule 136 (List)
 
 
 State 207
@@ -3773,16 +3864,16 @@ State 208
 
 State 209
 
-  148 FunctionParameterStmt: VARIABLE_T • IDENT
-  150                      | VARIABLE_T • IDENT $@24 '[' ']'
+  149 FunctionParameterStmt: VARIABLE_T • IDENT
+  151                      | VARIABLE_T • IDENT $@24 '[' ']'
 
     IDENT  shift, and go to state 224
 
 
 State 210
 
-  144 FunctionDefStmt: VARIABLE_T IDENT $@21 '(' $@22 FunctionParameterStmtList • ')' $@23 '{' GlobalStmtList '}'
-  145 FunctionParameterStmtList: FunctionParameterStmtList • ',' FunctionParameterStmt
+  145 FunctionDefStmt: VARIABLE_T IDENT $@21 '(' $@22 FunctionParameterStmtList • ')' $@23 '{' GlobalStmtList ReturnStmt '}'
+  146 FunctionParameterStmtList: FunctionParameterStmtList • ',' FunctionParameterStmt
 
     ')'  shift, and go to state 225
     ','  shift, and go to state 226
@@ -3790,9 +3881,9 @@ State 210
 
 State 211
 
-  146 FunctionParameterStmtList: FunctionParameterStmt •
+  147 FunctionParameterStmtList: FunctionParameterStmt •
 
-    $default  reduce using rule 146 (FunctionParameterStmtList)
+    $default  reduce using rule 147 (FunctionParameterStmtList)
 
 
 State 212
@@ -3888,7 +3979,17 @@ State 214
     VARIABLE_T  shift, and go to state 10
     IDENT       shift, and go to state 11
 
-    $default  reduce using rule 40 ($@11)
+    COUT        [reduce using rule 81 (ReturnStmt)]
+    IF          [reduce using rule 81 (ReturnStmt)]
+    FOR         [reduce using rule 81 (ReturnStmt)]
+    WHILE       [reduce using rule 81 (ReturnStmt)]
+    RETURN      [reduce using rule 81 (ReturnStmt)]
+    BREAK       [reduce using rule 81 (ReturnStmt)]
+    '}'         reduce using rule 40 ($@11)
+    '}'         [reduce using rule 81 (ReturnStmt)]
+    VARIABLE_T  [reduce using rule 81 (ReturnStmt)]
+    IDENT       [reduce using rule 81 (ReturnStmt)]
+    $default    reduce using rule 40 ($@11)
 
     GlobalStmt          go to state 63
     FunctionCallStmt    go to state 14
@@ -3925,6 +4026,16 @@ State 216
     VARIABLE_T  shift, and go to state 10
     IDENT       shift, and go to state 11
 
+    COUT        [reduce using rule 81 (ReturnStmt)]
+    IF          [reduce using rule 81 (ReturnStmt)]
+    FOR         [reduce using rule 81 (ReturnStmt)]
+    WHILE       [reduce using rule 81 (ReturnStmt)]
+    RETURN      [reduce using rule 81 (ReturnStmt)]
+    BREAK       [reduce using rule 81 (ReturnStmt)]
+    VARIABLE_T  [reduce using rule 81 (ReturnStmt)]
+    IDENT       [reduce using rule 81 (ReturnStmt)]
+    $default    reduce using rule 81 (ReturnStmt)
+
     GlobalStmtList      go to state 230
     GlobalStmt          go to state 13
     FunctionCallStmt    go to state 14
@@ -3954,14 +4065,28 @@ State 217
     VARIABLE_T  shift, and go to state 10
     IDENT       shift, and go to state 11
 
+    $end        reduce using rule 33 (CompoundStmt)
+    $end        [reduce using rule 81 (ReturnStmt)]
     COUT        [reduce using rule 33 (CompoundStmt)]
+    COUT        [reduce using rule 81 (ReturnStmt)]
     IF          [reduce using rule 33 (CompoundStmt)]
+    IF          [reduce using rule 81 (ReturnStmt)]
+    ELSE        reduce using rule 33 (CompoundStmt)
+    ELSE        [reduce using rule 81 (ReturnStmt)]
     FOR         [reduce using rule 33 (CompoundStmt)]
+    FOR         [reduce using rule 81 (ReturnStmt)]
     WHILE       [reduce using rule 33 (CompoundStmt)]
+    WHILE       [reduce using rule 81 (ReturnStmt)]
     RETURN      [reduce using rule 33 (CompoundStmt)]
+    RETURN      [reduce using rule 81 (ReturnStmt)]
     BREAK       [reduce using rule 33 (CompoundStmt)]
+    BREAK       [reduce using rule 81 (ReturnStmt)]
+    '}'         reduce using rule 33 (CompoundStmt)
+    '}'         [reduce using rule 81 (ReturnStmt)]
     VARIABLE_T  [reduce using rule 33 (CompoundStmt)]
+    VARIABLE_T  [reduce using rule 81 (ReturnStmt)]
     IDENT       [reduce using rule 33 (CompoundStmt)]
+    IDENT       [reduce using rule 81 (ReturnStmt)]
     $default    reduce using rule 33 (CompoundStmt)
 
     GlobalStmt          go to state 63
@@ -4032,7 +4157,7 @@ State 220
 
 State 221
 
-  136 List: Expression ']' '[' • Expression ']'
+  137 List: Expression ']' '[' • Expression ']'
 
     IDENT      shift, and go to state 30
     BOOL_LIT   shift, and go to state 31
@@ -4079,27 +4204,27 @@ State 223
 
 State 224
 
-  148 FunctionParameterStmt: VARIABLE_T IDENT •
-  150                      | VARIABLE_T IDENT • $@24 '[' ']'
+  149 FunctionParameterStmt: VARIABLE_T IDENT •
+  151                      | VARIABLE_T IDENT • $@24 '[' ']'
 
-    '['       reduce using rule 149 ($@24)
-    $default  reduce using rule 148 (FunctionParameterStmt)
+    '['       reduce using rule 150 ($@24)
+    $default  reduce using rule 149 (FunctionParameterStmt)
 
     $@24  go to state 235
 
 
 State 225
 
-  144 FunctionDefStmt: VARIABLE_T IDENT $@21 '(' $@22 FunctionParameterStmtList ')' • $@23 '{' GlobalStmtList '}'
+  145 FunctionDefStmt: VARIABLE_T IDENT $@21 '(' $@22 FunctionParameterStmtList ')' • $@23 '{' GlobalStmtList ReturnStmt '}'
 
-    $default  reduce using rule 143 ($@23)
+    $default  reduce using rule 144 ($@23)
 
     $@23  go to state 236
 
 
 State 226
 
-  145 FunctionParameterStmtList: FunctionParameterStmtList ',' • FunctionParameterStmt
+  146 FunctionParameterStmtList: FunctionParameterStmtList ',' • FunctionParameterStmt
 
     VARIABLE_T  shift, and go to state 209
 
@@ -4142,6 +4267,16 @@ State 230
     VARIABLE_T  shift, and go to state 10
     IDENT       shift, and go to state 11
 
+    COUT        [reduce using rule 81 (ReturnStmt)]
+    IF          [reduce using rule 81 (ReturnStmt)]
+    FOR         [reduce using rule 81 (ReturnStmt)]
+    WHILE       [reduce using rule 81 (ReturnStmt)]
+    RETURN      [reduce using rule 81 (ReturnStmt)]
+    BREAK       [reduce using rule 81 (ReturnStmt)]
+    '}'         [reduce using rule 81 (ReturnStmt)]
+    VARIABLE_T  [reduce using rule 81 (ReturnStmt)]
+    IDENT       [reduce using rule 81 (ReturnStmt)]
+
     GlobalStmt          go to state 63
     FunctionCallStmt    go to state 14
     JumpStmt            go to state 15
@@ -4165,7 +4300,7 @@ State 231
 
 State 232
 
-  136 List: Expression ']' '[' Expression • ']'
+  137 List: Expression ']' '[' Expression • ']'
 
     ']'  shift, and go to state 241
 
@@ -4191,23 +4326,23 @@ State 234
 
 State 235
 
-  150 FunctionParameterStmt: VARIABLE_T IDENT $@24 • '[' ']'
+  151 FunctionParameterStmt: VARIABLE_T IDENT $@24 • '[' ']'
 
     '['  shift, and go to state 244
 
 
 State 236
 
-  144 FunctionDefStmt: VARIABLE_T IDENT $@21 '(' $@22 FunctionParameterStmtList ')' $@23 • '{' GlobalStmtList '}'
+  145 FunctionDefStmt: VARIABLE_T IDENT $@21 '(' $@22 FunctionParameterStmtList ')' $@23 • '{' GlobalStmtList ReturnStmt '}'
 
     '{'  shift, and go to state 245
 
 
 State 237
 
-  145 FunctionParameterStmtList: FunctionParameterStmtList ',' FunctionParameterStmt •
+  146 FunctionParameterStmtList: FunctionParameterStmtList ',' FunctionParameterStmt •
 
-    $default  reduce using rule 145 (FunctionParameterStmtList)
+    $default  reduce using rule 146 (FunctionParameterStmtList)
 
 
 State 238
@@ -4235,9 +4370,9 @@ State 240
 
 State 241
 
-  136 List: Expression ']' '[' Expression ']' •
+  137 List: Expression ']' '[' Expression ']' •
 
-    $default  reduce using rule 136 (List)
+    $default  reduce using rule 137 (List)
 
 
 State 242
@@ -4285,14 +4420,14 @@ State 243
 
 State 244
 
-  150 FunctionParameterStmt: VARIABLE_T IDENT $@24 '[' • ']'
+  151 FunctionParameterStmt: VARIABLE_T IDENT $@24 '[' • ']'
 
     ']'  shift, and go to state 250
 
 
 State 245
 
-  144 FunctionDefStmt: VARIABLE_T IDENT $@21 '(' $@22 FunctionParameterStmtList ')' $@23 '{' • GlobalStmtList '}'
+  145 FunctionDefStmt: VARIABLE_T IDENT $@21 '(' $@22 FunctionParameterStmtList ')' $@23 '{' • GlobalStmtList ReturnStmt '}'
 
     COUT        shift, and go to state 4
     IF          shift, and go to state 5
@@ -4302,6 +4437,16 @@ State 245
     BREAK       shift, and go to state 9
     VARIABLE_T  shift, and go to state 10
     IDENT       shift, and go to state 11
+
+    COUT        [reduce using rule 81 (ReturnStmt)]
+    IF          [reduce using rule 81 (ReturnStmt)]
+    FOR         [reduce using rule 81 (ReturnStmt)]
+    WHILE       [reduce using rule 81 (ReturnStmt)]
+    RETURN      [reduce using rule 81 (ReturnStmt)]
+    BREAK       [reduce using rule 81 (ReturnStmt)]
+    VARIABLE_T  [reduce using rule 81 (ReturnStmt)]
+    IDENT       [reduce using rule 81 (ReturnStmt)]
+    $default    reduce using rule 81 (ReturnStmt)
 
     GlobalStmtList      go to state 251
     GlobalStmt          go to state 13
@@ -4389,15 +4534,15 @@ State 249
 
 State 250
 
-  150 FunctionParameterStmt: VARIABLE_T IDENT $@24 '[' ']' •
+  151 FunctionParameterStmt: VARIABLE_T IDENT $@24 '[' ']' •
 
-    $default  reduce using rule 150 (FunctionParameterStmt)
+    $default  reduce using rule 151 (FunctionParameterStmt)
 
 
 State 251
 
     4 GlobalStmtList: GlobalStmtList • GlobalStmt
-  144 FunctionDefStmt: VARIABLE_T IDENT $@21 '(' $@22 FunctionParameterStmtList ')' $@23 '{' GlobalStmtList • '}'
+  145 FunctionDefStmt: VARIABLE_T IDENT $@21 '(' $@22 FunctionParameterStmtList ')' $@23 '{' GlobalStmtList • ReturnStmt '}'
 
     COUT        shift, and go to state 4
     IF          shift, and go to state 5
@@ -4405,9 +4550,18 @@ State 251
     WHILE       shift, and go to state 7
     RETURN      shift, and go to state 8
     BREAK       shift, and go to state 9
-    '}'         shift, and go to state 254
     VARIABLE_T  shift, and go to state 10
     IDENT       shift, and go to state 11
+
+    COUT        [reduce using rule 81 (ReturnStmt)]
+    IF          [reduce using rule 81 (ReturnStmt)]
+    FOR         [reduce using rule 81 (ReturnStmt)]
+    WHILE       [reduce using rule 81 (ReturnStmt)]
+    RETURN      [reduce using rule 81 (ReturnStmt)]
+    BREAK       [reduce using rule 81 (ReturnStmt)]
+    VARIABLE_T  [reduce using rule 81 (ReturnStmt)]
+    IDENT       [reduce using rule 81 (ReturnStmt)]
+    $default    reduce using rule 81 (ReturnStmt)
 
     GlobalStmt          go to state 63
     FunctionCallStmt    go to state 14
@@ -4417,7 +4571,7 @@ State 251
     AssignStmt          go to state 18
     AssignBody          go to state 19
     DefineVariableStmt  go to state 20
-    ReturnStmt          go to state 21
+    ReturnStmt          go to state 254
     CoutStmt            go to state 22
     FunctionCall        go to state 23
     FunctionDefStmt     go to state 24
@@ -4466,9 +4620,13 @@ State 253
 
 State 254
 
-  144 FunctionDefStmt: VARIABLE_T IDENT $@21 '(' $@22 FunctionParameterStmtList ')' $@23 '{' GlobalStmtList '}' •
+    9 GlobalStmt: ReturnStmt •
+  145 FunctionDefStmt: VARIABLE_T IDENT $@21 '(' $@22 FunctionParameterStmtList ')' $@23 '{' GlobalStmtList ReturnStmt • '}'
 
-    $default  reduce using rule 144 (FunctionDefStmt)
+    '}'  shift, and go to state 256
+
+    '}'       [reduce using rule 9 (GlobalStmt)]
+    $default  reduce using rule 9 (GlobalStmt)
 
 
 State 255
@@ -4476,3 +4634,10 @@ State 255
    77 ArrayEles: ArrayEles ',' @18 Assignable •
 
     $default  reduce using rule 77 (ArrayEles)
+
+
+State 256
+
+  145 FunctionDefStmt: VARIABLE_T IDENT $@21 '(' $@22 FunctionParameterStmtList ')' $@23 '{' GlobalStmtList ReturnStmt '}' •
+
+    $default  reduce using rule 145 (FunctionDefStmt)

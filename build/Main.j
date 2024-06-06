@@ -3,6 +3,8 @@
 .method public static calculate_pi(I)
     .limit stack 100
     .limit locals 100
+    iload 0
+    istore 0
     ldc 3.000000
     fstore 1
     ldc 2.000000
@@ -89,10 +91,12 @@
 .method public static main([Ljava/lang/String;)V
     .limit stack 100
     .limit locals 100
+    aload 0
+    astore 6
     ldc 100
     istore 7
     iload 7
-    invokestatic Main/check(IILjava/lang/String;B)B
+    invokestatic Main/calculate_pi(I)
     fstore 8
     getstatic java/lang/System/out Ljava/io/PrintStream;
     ldc "Approximation of Pi after ";

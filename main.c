@@ -530,10 +530,9 @@ void addPrintExp_j(ObjectType type) {
 	}
 }
 
-void addRet_j(char* name){
-	ObjectType type = getFuncType(name);
-	
-	if(type == OBJECT_TYPE_VOID) codeRaw("return");
+void addRet_j(ObjectType type, int isMain){
+
+	if(isMain == 1 || type == OBJECT_TYPE_VOID) codeRaw("return");
 	else if(type == OBJECT_TYPE_BOOL || type == OBJECT_TYPE_INT) codeRaw("ireturn");
 	else if(type == OBJECT_TYPE_FLOAT) codeRaw("freturn");
 }
@@ -757,6 +756,13 @@ void printSigByName(char* name) {
 	Object *var = getObjectByName(name, 'f');
 	SymbolData *sym = var->symbol;
 	printf("%s",sym->func_sig);
+}
+
+//當函數呼叫的時候，用於回傳函數呼叫的資訊
+char* getSigByName(char* name) {
+	Object *var = getObjectByName(name, 'f');
+	SymbolData *sym = var->symbol;
+	return sym->func_sig;
 }
 
 //根據名稱獲取該變數的object

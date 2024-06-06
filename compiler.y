@@ -10,6 +10,10 @@
 	ObjectType nowDealType;	//用於變數設值的時候，紀錄值的類型，用於判斷變數與值類型是否相同
 
 	int array_ct = 0;	//用於紀錄連續的陣列變數宣告
+	int para_ct	=0;	//紀錄參數數量的變數
+	Object* para[100];	//紀錄參數的型態
+
+	int isMain = 0;	//確認現在是不是在main中
 %}
 
 
@@ -310,6 +314,13 @@ Declarator
 		//二維陣列的變數宣告
 		insert($<s_var>1, $<var_type>0, 0);
 
+		/*這裡的實現應該是取yacc計算出來的expression
+		用於紀錄這個list的一維、二維大小，之後直接傳給java做計算
+		就可以適配各種長寬的二維陣列
+		
+		可惜我沒有算yacc的結果，所以之後有空再弄
+		不過這個list在浮點數上能不能用也是未知數*/
+
 		codeRaw("imul");
 
 		//創建陣列
@@ -351,9 +362,15 @@ ArrayEles
 ReturnStmt
     : RETURN Expression ';' {
 		printf("RETURN\n");
+		addRet_j($<object_val>1.type, isMain);	//添加函數回傳
 	}
     | RETURN ';' {
 		printf("RETURN\n");
+		addRet_j(OBJECT_TYPE_VOID, 0);	//添加函數回傳
+	}
+	| {
+		printf("RETURN\n");
+		addRet_j(OBJECT_TYPE_VOID, 0);	//添加函數回傳
 	}
 ;
 
@@ -678,7 +695,7 @@ FunctionCall
 		printSigByName($<s_var>1);
 		printf("\n");
 
-		codeRaw("invokestatic Main/check(IILjava/lang/String;B)B");
+		code("invokestatic Main/%s%s", $<s_var>1, getSigByName($<s_var>1));
 	}
 ;
 
@@ -697,13 +714,32 @@ FunctionDefStmt
     : VARIABLE_T IDENT {
 		createFunction($<var_type>1, $<s_var>2);
 		addFunDef_j($<s_var>2, 'n');
+
+		if(strcmp($<s_var>2, "main")==0) isMain = 1;
+		else isMain = 0;
 	} '(' {
 		pushScope();
+
+		para_ct = 0;
 	} FunctionParameterStmtList ')' {
 		setFuncSig($<s_var>2, $<var_type>1);
 		addFunDef_j($<s_var>2, 's');		//傳入函數名稱，在main.j中建立函數
-	} '{' GlobalStmtList '}' {
-		addRet_j($<s_var>2);	//添加函數回傳
+	
+		//在函數區塊，重置變數位置
+		for(int i=0;i<para_ct;i++) {
+			
+			SymbolData* sp = para[i]->symbol;
+			ObjectType type= para[i]->type;
+
+			//創建並添加該變數
+			if(type == OBJECT_TYPE_INT || type == OBJECT_TYPE_BOOL) code("iload %d", i);
+			else if(type ==OBJECT_TYPE_FLOAT) code("fload %d", i);
+			else if(type ==OBJECT_TYPE_STR) code("aload %d", i);
+
+			addLocalVar_j(sp->name, 'y', type);
+		}
+
+	} '{' GlobalStmtList ReturnStmt '}' {
 		dumpScope();
 		addFunEnd_j();	//添加函數結尾
 	}
@@ -715,8 +751,19 @@ FunctionParameterStmtList
 ;
 
 FunctionParameterStmt
-    : VARIABLE_T IDENT { insert($<s_var>2, $<var_type>1, 3); }
-    | VARIABLE_T IDENT { insert($<s_var>2, $<var_type>1, 4); } '[' ']' //支援不帶index的一維陣列
+    : VARIABLE_T IDENT {
+		insert($<s_var>2, $<var_type>1, 3);
+
+		para[para_ct] = getObjectByName($<s_var>2, 'v');
+		para_ct++;
+	}
+    | VARIABLE_T IDENT { 
+		insert($<s_var>2, $<var_type>1, 4);
+
+		para[para_ct] = getObjectByName($<s_var>2, 'v');
+		para_ct++;
+
+	} '[' ']' //支援不帶index的一維陣列
 ;
 %%
 /* C code section */
