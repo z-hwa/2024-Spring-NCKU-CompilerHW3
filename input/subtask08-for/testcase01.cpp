@@ -3,9 +3,9 @@ int main(string argv[]) {
     for(int i=0;i<c;i++) {
         cout << "Hello world" << endl;
     }
-    // for(;c>=0;c-=1) {
-    //     cout << "apple!" << endl;
-    // }
+    for(;c>=0;c-=1) {
+        cout << "apple!" << endl;
+    }
 
     return 0;
 }
