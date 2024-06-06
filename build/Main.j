@@ -8,6 +8,7 @@
     ldc 2.000000
     fstore 2
     ldc 1
+    istore 3
         ldc 1
         istore 4
         
@@ -53,6 +54,7 @@
         fmul
         fdiv
         fstore 5
+        iload 3
         
 
         ifeq else2
@@ -60,21 +62,25 @@
             fload 5
             fadd
             fstore 1
+            iload 3
             ldc 0
+            istore 3
         goto out3
         else2:
             fload 1
             fload 5
             fsub
             fstore 1
+            iload 3
             ldc 1
+            istore 3
         out3:
         goto for0
     out1:
     
 
     fload 1
-    return
+    freturn
 .end method
 .method public static main([Ljava/lang/String;)V
     .limit stack 100
@@ -82,6 +88,7 @@
     ldc 100
     istore 7
     iload 7
+    invokestatic Main/check(IILjava/lang/String;B)B
     fstore 8
     getstatic java/lang/System/out Ljava/io/PrintStream;
     ldc "Approximation of Pi after ";

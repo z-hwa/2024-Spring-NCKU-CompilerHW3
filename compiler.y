@@ -344,7 +344,10 @@ Printable
 Expression
 	: Or
 	//| AssignBody {$<object_val>0.type = OBJECT_TYPE_BOOL;}
-	| STR_LIT {printf("STR_LIT \"%s\"\n", $<s_var>1);}
+	| STR_LIT {
+		printf("STR_LIT \"%s\"\n", $<s_var>1);
+		code("ldc \"%s\"", $<s_var>1);
+	}
 ;
 
 Or
@@ -577,7 +580,7 @@ Primary
 		addPushLocalVar_j($<s_var>1);
 		assign_var = $<s_var>1;	//設置當前修改的變數名稱
 	}
-	| FunctionCall //{printf("call: check(IILjava/lang/String;B)B\n");}
+	| FunctionCall
 	| IDENT '[' Expression ']' {
 			ObjectType type = getVarTypeByName($<s_var>1);
 			$<object_val>0.type = type;
@@ -599,6 +602,8 @@ FunctionCall
 		printf("call: %s", $<s_var>1);
 		printSigByName($<s_var>1);
 		printf("\n");
+
+		codeRaw("invokestatic Main/check(IILjava/lang/String;B)B");
 	}
 ;
 
@@ -623,7 +628,7 @@ FunctionDefStmt
 		setFuncSig($<s_var>2, $<var_type>1);
 		addFunDef_j($<s_var>2, 's');		//傳入函數名稱，在main.j中建立函數
 	} '{' GlobalStmtList '}' {
-		addRet_j();	//添加函數回傳
+		addRet_j($<s_var>2);	//添加函數回傳
 		dumpScope();
 		addFunEnd_j();	//添加函數結尾
 	}

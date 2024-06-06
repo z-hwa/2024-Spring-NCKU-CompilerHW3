@@ -171,7 +171,7 @@ void addPushLocalVar_j(char* name) {
 	ObjectType type = var->type;
 
 	//將stack頂端的數字儲存到變數中
-	if(type == OBJECT_TYPE_INT) {
+	if(type == OBJECT_TYPE_INT || type == OBJECT_TYPE_BOOL) {
 		code("iload %d", var_index);
 	}else if(type == OBJECT_TYPE_FLOAT) {
 		code("fload %d", var_index);
@@ -192,7 +192,7 @@ void addLocalVar_j(char* name, char isAssign, ObjectType valType) {
 	if(isAssign == 'n') codeRaw("ldc 0");
 
 	//將stack頂端的數字儲存到變數中
-	if(type == OBJECT_TYPE_INT) {
+	if(type == OBJECT_TYPE_INT || type == OBJECT_TYPE_BOOL) {
 		if(valType == OBJECT_TYPE_FLOAT) codeRaw("f2i");
 
 		code("istore %d", var_index);
@@ -491,8 +491,12 @@ void addPrintExp_j(ObjectType type) {
 	}
 }
 
-void addRet_j(){
-	codeRaw("return");
+void addRet_j(char* name){
+	ObjectType type = getFuncType(name);
+	
+	if(type == OBJECT_TYPE_VOID) codeRaw("return");
+	else if(type == OBJECT_TYPE_BOOL || type == OBJECT_TYPE_INT) codeRaw("ireturn");
+	else if(type == OBJECT_TYPE_FLOAT) codeRaw("freturn");
 }
 
 void addPrint_j(char* str){
@@ -566,7 +570,10 @@ void setFuncSig(char*name, ObjectType ret) {
 
 	//根據函數的回傳值，設置簽名(main 換成回傳void)
 	if(ret == OBJECT_TYPE_INT && strcmp(name, "main") != 0) strcat(funcSig, "I");
-	else if(ret == OBJECT_TYPE_INT && strcmp(name, "main") == 0) strcat(funcSig, "V"); 
+	else if(ret == OBJECT_TYPE_INT && strcmp(name, "main") == 0) {
+		strcat(funcSig, "V"); 
+		var->funcType = OBJECT_TYPE_VOID;
+	}
 	else if(ret == OBJECT_TYPE_VOID) strcat(funcSig, "V");
 	else if(ret == OBJECT_TYPE_BOOL) strcat(funcSig, "B");
 	else if(ret == OBJECT_TYPE_STR) strcat(funcSig, "Ljava/lang/String;");

@@ -48,7 +48,7 @@ typedef struct _object {
     uint8_t flag;
     SymbolData* symbol;
 
-	ObjectType funcType;
+	ObjectType funcType;    //函數的回傳類型
     //LinkedList* arraySubscript;
 } Object;
 
