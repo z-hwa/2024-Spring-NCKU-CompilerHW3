@@ -212,8 +212,14 @@ AssignList
 	}
 	| Expression ']' '[' Expression ']' {
 		printIDByName(assign_var, 'v');
+
+		codeRaw("swap");
+		codeRaw("ldc 3");
+		codeRaw("imul");
+		codeRaw("iadd");//count index
 	} Assign {
 		$<object_val>0.type = OBJECT_TYPE_BOOL;
+		addArrayEle_j(nowDealType);
 	}
 ;
 
@@ -268,7 +274,7 @@ Assignable
 
 /* define variable */
 DefineVariableStmt
-	: VARIABLE_T  DeclaratorList ';' {typeSet(false);}
+	: VARIABLE_T DeclaratorList ';' {typeSet(false);}
 ;
 
 DeclaratorList
@@ -296,13 +302,19 @@ Declarator
 		printf("create array: %d\n", 0);
 		insert($<s_var>1, $<var_type>0, 0);
 
-		//創建陣列
 		codeRaw("newarray int");	//宣告陣列
+
 		addLocalVar_j($<s_var>1, 'y', OBJECT_TYPE_VOID);
 	}
 	| IDENT '[' Expression ']' '[' Expression ']' {
 		//二維陣列的變數宣告
 		insert($<s_var>1, $<var_type>0, 0);
+
+		codeRaw("imul");
+
+		//創建陣列
+		codeRaw("newarray int");	//宣告陣列
+		addLocalVar_j($<s_var>1, 'y', OBJECT_TYPE_VOID);
 	}
 	| IDENT '[' Expression ']' {
 		codeRaw("newarray int");	//宣告陣列
@@ -646,6 +658,13 @@ List
 		ObjectType type = getVarTypeByName(assign_var);
 		$<object_val>0.type = type;
 		printIDByName(assign_var, 'v');
+
+		codeRaw("swap");
+		codeRaw("ldc 3");
+		codeRaw("imul");
+		codeRaw("iadd");//count index
+
+		addPushLocalVar_j(assign_var, 'l');
 	}
 ;
 
