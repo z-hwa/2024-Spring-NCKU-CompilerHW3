@@ -615,6 +615,7 @@ void setFuncSig(char*name, ObjectType ret) {
 	else if(ret == OBJECT_TYPE_VOID) strcat(funcSig, "V");
 	else if(ret == OBJECT_TYPE_BOOL) strcat(funcSig, "B");
 	else if(ret == OBJECT_TYPE_STR) strcat(funcSig, "Ljava/lang/String;");
+	else if(ret == OBJECT_TYPE_FLOAT) strcat(funcSig, "F");
 
 	//設置函數簽名
 	SymbolData *sym = var->symbol;

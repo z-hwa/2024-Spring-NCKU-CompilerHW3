@@ -9,7 +9,8 @@ float calculate_pi(int terms) {
         if (add) {
             pi += term;
             add = false;
-        } else {
+        } 
+        else {
             pi -= term;
             add = true;
         }

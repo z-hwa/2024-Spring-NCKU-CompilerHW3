@@ -1,6 +1,6 @@
 .class public Main
 .super java/lang/Object
-.method public static calculate_pi(I)
+.method public static calculate_pi(I)F
     .limit stack 100
     .limit locals 100
     iload 0
@@ -70,6 +70,8 @@
             fstore 1
             iload 3
             ldc 0
+            swap
+            pop
             istore 3
         goto out4
         else3:
@@ -79,6 +81,8 @@
             fstore 1
             iload 3
             ldc 1
+            swap
+            pop
             istore 3
         out4:
         goto f42
@@ -94,7 +98,7 @@
     ldc 100
     istore 7
     iload 7
-    invokestatic Main/calculate_pi(I)
+    invokestatic Main/calculate_pi(I)F
     fstore 8
     getstatic java/lang/System/out Ljava/io/PrintStream;
     ldc "Approximation of Pi after ";

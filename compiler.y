@@ -14,6 +14,7 @@
 	Object* para[100];	//紀錄參數的型態
 
 	int isMain = 0;	//確認現在是不是在main中
+	int isEqlAss = 0; //確認是不是=
 %}
 
 
@@ -195,6 +196,13 @@ AssignBody
 	} Assign {
 		$<object_val>0.type = OBJECT_TYPE_BOOL;	//設值成功，回傳bool
 
+		if(isEqlAss == 1) {
+			codeRaw("swap");
+			codeRaw("pop");
+		}
+
+		isEqlAss = 0; //reset
+
 		//將變數設值
 		addLocalVar_j($<s_var>1, 'y', nowDealType);
 	}
@@ -231,6 +239,7 @@ Assign
 	: Assignable
 	| VAL_ASSIGN Assign{
 		printf("EQL_ASSIGN\n");
+		isEqlAss = 1;
 	}
 	| ADD_ASSIGN Assign{
 		printf("ADD_ASSIGN\n");
