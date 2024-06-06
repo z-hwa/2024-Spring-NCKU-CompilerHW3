@@ -647,8 +647,8 @@ static const yytype_int16 yyrline[] =
      517,   518,   525,   526,   532,   541,   542,   547,   552,   562,
      563,   572,   579,   582,   589,   594,   598,   599,   608,   620,
      627,   634,   637,   644,   656,   657,   657,   667,   674,   691,
-     703,   707,   708,   714,   720,   724,   714,   748,   749,   750,
-     754,   760,   760
+     703,   707,   708,   714,   720,   724,   714,   750,   751,   752,
+     756,   762,   762
 };
 #endif
 
@@ -2371,46 +2371,48 @@ yyreduce:
 		setFuncSig((yyvsp[-5].s_var), (yyvsp[-6].var_type));
 		addFunDef_j((yyvsp[-5].s_var), 's');		//傳入函數名稱，在main.j中建立函數
 	
-		//在函數區塊，重置變數位置
-		for(int i=0;i<para_ct;i++) {
-			
-			SymbolData* sp = para[i]->symbol;
-			ObjectType type= para[i]->type;
+		if(isMain == 0) {
+			//在函數區塊，重置變數位置
+			for(int i=0;i<para_ct;i++) {
+				
+				SymbolData* sp = para[i]->symbol;
+				ObjectType type= para[i]->type;
 
-			//創建並添加該變數
-			if(type == OBJECT_TYPE_INT || type == OBJECT_TYPE_BOOL) code("iload %d", i);
-			else if(type ==OBJECT_TYPE_FLOAT) code("fload %d", i);
-			else if(type ==OBJECT_TYPE_STR) code("aload %d", i);
+				//創建並添加該變數
+				if(type == OBJECT_TYPE_INT || type == OBJECT_TYPE_BOOL) code("iload %d", i);
+				else if(type ==OBJECT_TYPE_FLOAT) code("fload %d", i);
+				else if(type ==OBJECT_TYPE_STR) code("aload %d", i);
 
-			addLocalVar_j(sp->name, 'y', type);
+				addLocalVar_j(sp->name, 'y', type);
+			}
 		}
 
 	}
-#line 2390 "./build/y.tab.c"
+#line 2392 "./build/y.tab.c"
     break;
 
   case 146: /* FunctionDefStmt: VARIABLE_T IDENT $@21 '(' $@22 FunctionParameterStmtList ')' $@23 '{' GlobalStmtList ReturnStmt '}'  */
-#line 742 "./compiler.y"
+#line 744 "./compiler.y"
                                             {
 		dumpScope();
 		addFunEnd_j();	//添加函數結尾
 	}
-#line 2399 "./build/y.tab.c"
+#line 2401 "./build/y.tab.c"
     break;
 
   case 150: /* FunctionParameterStmt: VARIABLE_T IDENT  */
-#line 754 "./compiler.y"
+#line 756 "./compiler.y"
                        {
 		insert((yyvsp[0].s_var), (yyvsp[-1].var_type), 3);
 
 		para[para_ct] = getObjectByName((yyvsp[0].s_var), 'v');
 		para_ct++;
 	}
-#line 2410 "./build/y.tab.c"
+#line 2412 "./build/y.tab.c"
     break;
 
   case 151: /* $@24: %empty  */
-#line 760 "./compiler.y"
+#line 762 "./compiler.y"
                        { 
 		insert((yyvsp[0].s_var), (yyvsp[-1].var_type), 4);
 
@@ -2418,11 +2420,11 @@ yyreduce:
 		para_ct++;
 
 	}
-#line 2422 "./build/y.tab.c"
+#line 2424 "./build/y.tab.c"
     break;
 
 
-#line 2426 "./build/y.tab.c"
+#line 2428 "./build/y.tab.c"
 
       default: break;
     }
@@ -2615,6 +2617,6 @@ yyreturnlab:
   return yyresult;
 }
 
-#line 768 "./compiler.y"
+#line 770 "./compiler.y"
 
 /* C code section */

@@ -725,18 +725,20 @@ FunctionDefStmt
 		setFuncSig($<s_var>2, $<var_type>1);
 		addFunDef_j($<s_var>2, 's');		//傳入函數名稱，在main.j中建立函數
 	
-		//在函數區塊，重置變數位置
-		for(int i=0;i<para_ct;i++) {
-			
-			SymbolData* sp = para[i]->symbol;
-			ObjectType type= para[i]->type;
+		if(isMain == 0) {
+			//在函數區塊，重置變數位置
+			for(int i=0;i<para_ct;i++) {
+				
+				SymbolData* sp = para[i]->symbol;
+				ObjectType type= para[i]->type;
 
-			//創建並添加該變數
-			if(type == OBJECT_TYPE_INT || type == OBJECT_TYPE_BOOL) code("iload %d", i);
-			else if(type ==OBJECT_TYPE_FLOAT) code("fload %d", i);
-			else if(type ==OBJECT_TYPE_STR) code("aload %d", i);
+				//創建並添加該變數
+				if(type == OBJECT_TYPE_INT || type == OBJECT_TYPE_BOOL) code("iload %d", i);
+				else if(type ==OBJECT_TYPE_FLOAT) code("fload %d", i);
+				else if(type ==OBJECT_TYPE_STR) code("aload %d", i);
 
-			addLocalVar_j(sp->name, 'y', type);
+				addLocalVar_j(sp->name, 'y', type);
+			}
 		}
 
 	} '{' GlobalStmtList ReturnStmt '}' {

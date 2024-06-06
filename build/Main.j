@@ -91,8 +91,6 @@
 .method public static main([Ljava/lang/String;)V
     .limit stack 100
     .limit locals 100
-    aload 0
-    astore 6
     ldc 100
     istore 7
     iload 7
